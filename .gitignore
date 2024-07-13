@@ -1,0 +1,29 @@
+# Compiled object files
+*.o
+*.obj
+
+# Compiled static libraries
+*.lib
+*.a
+
+# Compiled dynamic libraries
+*.dll
+*.so
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Generated files
+*.gcno
+*.gcda
+*.gcov
+
+# Dependency files
+*.d
+
+# Build directories
+build/
+cmake-build-*/
