@@ -1,4 +1,4 @@
-
+<!-- This section is about the introduction -->
 
 #### Neopixel Amblight project (NeoLightFX)
 - Old - https://youtu.be/yg12cg38Jvo
