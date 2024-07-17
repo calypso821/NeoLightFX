@@ -1,5 +1,5 @@
 #include "LEDStripController.h"
-#include "rpi3/LEDStripControllerRpi3.h"
+#include "LEDStripControllerRpi3.h"
 
 
 int main()
@@ -9,6 +9,8 @@ int main()
     controller = new LEDStripControllerRpi3();
 
     controller->init();
+    controller->clear();
+    controller->render();
 
 
     return 0;
