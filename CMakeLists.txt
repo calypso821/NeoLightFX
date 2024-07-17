@@ -14,3 +14,4 @@ file(GLOB SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
 # Add the source files to the example application executable
 #add_executable(runExampleApp examples/main.cpp ${SOURCES})
 add_executable(runExampleApp examples/main.cpp src/LEDColorController.cpp)
+add_executable(runRpi3App examples/rpi3.cpp src/LEDColorController.cpp)
