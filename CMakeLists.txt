@@ -47,4 +47,5 @@ add_executable(runExampleApp ${EX_MAIN_CPP} ${SOURCES} ${SUBMODULE_SOURCES})
 add_executable(runRpi3App ${EX_RPI3_CPP} ${SOURCES} ${SUBMODULE_SOURCES})
 
 # Link the static library with the example application executables
+target_link_libraries(runExampleApp rpi_ws281x)
 target_link_libraries(runRpi3App rpi_ws281x)
