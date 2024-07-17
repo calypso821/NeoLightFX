@@ -1,18 +1,14 @@
 #ifndef LEDSTRIPCONTROLLER_H
 #define LEDSTRIPCONTROLLER_H
 
-#include <ws2811.h>
-
 class LEDStripController {
 public:
-    LEDStripController(int brightness);
-    ~LEDStripController();
-    void render(ws2811_led_t* array);
-    void clear(ws2811_led_t* array);
+    virtual ~LEDStripController() {}
 
-private:
-    ws2811_t ledstring;
-    ws2811_return_t ret;
+    virtual void init() = 0;
+    virtual void clear() = 0;
+    virtual void render() = 0;
+    //virtual void setBrightness(int brightness) = 0;
 };
 
 #endif // LEDSTRIPCONTROLLER_H
