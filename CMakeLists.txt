@@ -19,5 +19,5 @@ set(SOURCES
 )
 
 # Add the source files to the example application executable
-add_executable(runExampleApp examples/main.cpp ${SOURCES})
-add_executable(runRpi3App examples/rpi3.cpp ${SOURCES})
+add_executable(runExampleApp example/main.cpp ${SOURCES})
+add_executable(runRpi3App example/rpi3.cpp ${SOURCES})
