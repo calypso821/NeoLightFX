@@ -1,0 +1,3 @@
+[submodule "rpi3/third_party/rpi_281x"]
+	path = rpi3/third_party/rpi_281x
+	url = https://github.com/calypso821/rpi_ws281x.git
