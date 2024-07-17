@@ -3,6 +3,11 @@
 #include "LEDStripControllerRpi3.h"
 
 
+//#include "third_party/rpi_281x/ws2811.h"
+//#include <ws2811.h>
+//#include <third_party/rpi_281x/ws2811.h>
+
+
 
 void LEDStripControllerRpi3::init() {
     // Implementation specific to rpi3
