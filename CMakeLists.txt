@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.10)
 project(NeoLightFX)
 
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    message(FATAL_ERROR "Building this project on Windows is not supported.")
+endif()
+
+
 # Specify the C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
