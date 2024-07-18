@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 
 #include "LEDStripControllerRpi3.h"
 
@@ -10,17 +11,16 @@
 #define STRIP_TYPE              WS2811_STRIP_GRB
 
 LEDStripControllerRpi3::LEDStripControllerRpi3(int ledCount)
-{
-    led_count = ledCount;
-}
+    : LEDStripController(ledCount) {} // Initialize base class 
 
-LEDStripControllerRpi3::~LEDStripControllerRpi3() {
+LEDStripControllerRpi3::~LEDStripControllerRpi3()
+{
     // Clean up ws2811 resources
-    ws2811_fini(led_array);
+    ws2811_fini(&led_array);
 }
 
 void LEDStripControllerRpi3::init() {
-    ws2811_t led_array =
+    led_array =
     {
         .freq = TARGET_FREQ,
         .dmanum = DMA,
@@ -30,7 +30,7 @@ void LEDStripControllerRpi3::init() {
             {
                 .gpionum = GPIO_PIN,
                 .invert = 0,
-                .count = led_count,
+                .count = m_ledCount,
                 .strip_type = STRIP_TYPE,
                 .brightness = 255,
             },
@@ -57,10 +57,6 @@ void LEDStripControllerRpi3::init() {
     }
 }
 
-void LEDStripControllerRpi3::clear() {
-    std::cout << "Clearing LED strip for RPi3" << std::endl;
-}
-
 void LEDStripControllerRpi3::render() {
     ws2811_return_t ret = ws2811_render(&led_array);
     //std::cout << "Redner status: " << ret << std::endl;
@@ -69,10 +65,23 @@ void LEDStripControllerRpi3::render() {
     {
         fprintf(stderr, "ws2811_render failed: %s\n", ws2811_get_return_t_str(ret));
     }
+}
 
-    for (int x = 0; x < led_count; x++) {
-       led_array.channel[0].leds[x] = 0xFFFFFF;
+void LEDStripControllerRpi3::led_array_setColor(uint32_t* colorArray)
+{
+    for (int x = 0; x < m_ledCount; x++) {
+        led_array.channel[0].leds[x] = colorArray[x];
     }
+}
+
+void LEDStripControllerRpi3::led_array_clear()
+{
+    memset(led_array.channel[0].leds, 0, m_ledCount * sizeof(uint32_t));
+}
+
+void LEDStripControllerRpi3::setBrightness(int brightness)
+{
+    // TODO
 }
 
 

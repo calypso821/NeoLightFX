@@ -12,7 +12,7 @@ $appName = "runRpi3App"
 if ($args.Length -eq 0) {
     # No argument provided, perform full build
     # Delete previous files and create directory
-    ssh ${remoteUser}@${remoteHost} @"
+    ssh -t ${remoteUser}@${remoteHost} @"
 rm -rf ${remotePath}
 mkdir -p ${remotePath}
 "@
@@ -21,18 +21,17 @@ mkdir -p ${remotePath}
     scp -r ${localProjectPath}/* ${remoteUser}@${remoteHost}:${remotePath}
 
     # SSH command to build the project
-    ssh ${remoteUser}@${remoteHost} @"
+    ssh -t ${remoteUser}@${remoteHost} @"
 rm -rf ${remoteBuildPath}
 mkdir -p ${remoteBuildPath}
 cd ${remoteBuildPath}
 cmake ${remotePath}
 cmake --build .
-sudo ./${appName}
 "@
 }
 
 # SSH command to run the app
-ssh ${remoteUser}@${remoteHost} "cd ${remoteBuildPath} && sudo ./${appName}"
+ssh -t ${remoteUser}@${remoteHost} "cd ${remoteBuildPath} && sudo ./${appName}"
 
 
 # Use
