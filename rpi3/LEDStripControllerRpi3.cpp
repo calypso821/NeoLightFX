@@ -1,27 +1,26 @@
 #include <iostream>
 
 #include "LEDStripControllerRpi3.h"
-#include "ws2811.h"
+
 
 // WS2811 definitions
 #define TARGET_FREQ             800000
-#define GPIO_PIN                18
+#define GPIO_PIN                12
 #define DMA                     10
-#define STRIP_TYPE              WS2811_STRIP_GRB		// WS2812/SK6812RGB integrated chip+leds
+#define STRIP_TYPE              WS2811_STRIP_GRB
 
-// LED definitions
-#define BOTTOM                  false   // include lower side
-  
-#define LED_HEIGHT              20      // number of leds (vertical)
-#define LED_WIDTH               34      // number of leds (horizontal)
-#define LED_COUNT               (LED_HEIGHT * 2 + LED_WIDTH + LED_WIDTH * BOTTOM)
+LEDStripControllerRpi3::LEDStripControllerRpi3(int ledCount)
+{
+    led_count = ledCount;
+}
 
+LEDStripControllerRpi3::~LEDStripControllerRpi3() {
+    // Clean up ws2811 resources
+    ws2811_fini(led_array);
+}
 
 void LEDStripControllerRpi3::init() {
-    // Implementation specific to rpi3
-    std::cout << "Initializing LED strip for RPi3" << std::endl;
-    
-    ws2811_t ledstring =
+    ws2811_t led_array =
     {
         .freq = TARGET_FREQ,
         .dmanum = DMA,
@@ -31,37 +30,49 @@ void LEDStripControllerRpi3::init() {
             {
                 .gpionum = GPIO_PIN,
                 .invert = 0,
-                .count = LED_COUNT,
+                .count = led_count,
                 .strip_type = STRIP_TYPE,
-                .brightness = 100,
-            },
-            [1] =
-            {
-                .gpionum = 0,
-                .invert = 0,
-                .count = 0,
-                .brightness = 0,
+                .brightness = 255,
             },
         },
     };
     
-    ws2811_return_t ret = ws2811_init(&ledstring);
-    
+    ws2811_return_t ret = ws2811_init(&led_array);
+
+
     if (ret != WS2811_SUCCESS) {
-        std::cerr << "ws2811_init failed: " << ws2811_get_return_t_str(ret) << std::endl;
+        throw std::runtime_error(std::string("LED strip ws2811 init failed: ")
+         + ws2811_get_return_t_str(ret));
     } else {
-        std::cerr << "ws2811_init: " << ws2811_get_return_t_str(ret) << std::endl;
+        std::cout << "LED strip ws2811 init: "
+        << ws2811_get_return_t_str(ret) << std::endl;
+    }
+    
+    // Check if memory was allocated for leds
+    if (!led_array.channel[0].leds) {
+        std::cerr << "Memory allocation for LEDs failed" << std::endl;
+        throw std::runtime_error("Memory allocation for LEDs failed");
+    } else {
+        std::cout << "Memory for LEDs successfully allocated" << std::endl;
     }
 }
 
 void LEDStripControllerRpi3::clear() {
-    // Implementation specific to rpi3
     std::cout << "Clearing LED strip for RPi3" << std::endl;
 }
 
 void LEDStripControllerRpi3::render() {
-    // Implementation specific to rpi3
-    std::cout << "Rendering LED strip for RPi3" << std::endl;
+    ws2811_return_t ret = ws2811_render(&led_array);
+    //std::cout << "Redner status: " << ret << std::endl;
+    
+    if (ret != WS2811_SUCCESS)
+    {
+        fprintf(stderr, "ws2811_render failed: %s\n", ws2811_get_return_t_str(ret));
+    }
+
+    for (int x = 0; x < led_count; x++) {
+       led_array.channel[0].leds[x] = 0xFFFFFF;
+    }
 }
 
 
