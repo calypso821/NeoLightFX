@@ -4,7 +4,7 @@
 class LEDStripController {
 public:
     // Constructor
-    LEDStripController(int ledCount) {}
+    LEDStripController(int ledCount) : led_count(ledCount) {}
 
     // Virtual Destructor
     virtual ~LEDStripController() {}
@@ -16,6 +16,9 @@ public:
     virtual void led_array_setColor(uint32_t* colorArray) = 0;
     virtual void led_array_clear() = 0;
     virtual void setBrightness(int brightness) = 0;
+
+protected:
+    int led_count; // Number of LEDs
 };
 
 #endif // LEDSTRIPCONTROLLER_H
