@@ -4,7 +4,7 @@
 class LEDStripController {
 public:
     // Constructor
-    LEDStripController(int ledCount) : led_count(ledCount) {}
+    LEDStripController(int ledCount) : m_ledCount(ledCount) {}
 
     // Virtual Destructor
     virtual ~LEDStripController() {}
@@ -18,7 +18,7 @@ public:
     virtual void setBrightness(int brightness) = 0;
 
 protected:
-    int led_count; // Number of LEDs
+    int m_ledCount; // Number of LEDs
 };
 
 #endif // LEDSTRIPCONTROLLER_H
