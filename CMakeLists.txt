@@ -12,8 +12,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Include directories
 include_directories(${PROJECT_SOURCE_DIR}/include)
-include_directories(${PROJECT_SOURCE_DIR}/rpi3)
-include_directories(${PROJECT_SOURCE_DIR}/rpi3/third_party/rpi_281x)
+include_directories(${PROJECT_SOURCE_DIR}/hardware)
+include_directories(${PROJECT_SOURCE_DIR}/hardware/rpi3)
+include_directories(${PROJECT_SOURCE_DIR}/hardware/rpi3/third_party/rpi_281x)
 
 # Gather all source files in the src directory
 # file(GLOB SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
@@ -21,7 +22,7 @@ include_directories(${PROJECT_SOURCE_DIR}/rpi3/third_party/rpi_281x)
 # Sources
 set(SOURCES
     ${PROJECT_SOURCE_DIR}/src/LEDColorController.cpp
-    ${PROJECT_SOURCE_DIR}/rpi3/LEDStripControllerRpi3.cpp
+    ${PROJECT_SOURCE_DIR}/hardware/rpi3/LEDStripControllerRpi3.cpp
 )
 
 # Add the submodule source files
@@ -32,12 +33,12 @@ set(SUBMODULE_SOURCES
 
 # Add the rpi_ws281x source files
 set(RPI_WS281X_SOURCES
-    ${PROJECT_SOURCE_DIR}/rpi3/third_party/rpi_281x/ws2811.c
-    ${PROJECT_SOURCE_DIR}/rpi3/third_party/rpi_281x/rpihw.c
-    ${PROJECT_SOURCE_DIR}/rpi3/third_party/rpi_281x/pwm.c
-    ${PROJECT_SOURCE_DIR}/rpi3/third_party/rpi_281x/dma.c
-    ${PROJECT_SOURCE_DIR}/rpi3/third_party/rpi_281x/pcm.c
-    ${PROJECT_SOURCE_DIR}/rpi3/third_party/rpi_281x/mailbox.c
+    ${PROJECT_SOURCE_DIR}/hardware/rpi3/third_party/rpi_281x/ws2811.c
+    ${PROJECT_SOURCE_DIR}/hardware/rpi3/third_party/rpi_281x/rpihw.c
+    ${PROJECT_SOURCE_DIR}/hardware/rpi3/third_party/rpi_281x/pwm.c
+    ${PROJECT_SOURCE_DIR}/hardware/rpi3/third_party/rpi_281x/dma.c
+    ${PROJECT_SOURCE_DIR}/hardware/rpi3/third_party/rpi_281x/pcm.c
+    ${PROJECT_SOURCE_DIR}/hardware/rpi3/third_party/rpi_281x/mailbox.c
 )
 
 # Create a static library from the submodule source files

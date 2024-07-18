@@ -41,12 +41,5 @@ int main()
 
     std::cout << "Exiting program." << std::endl;
     return 0;
-    
-    
-    
-    
-    
-    //controller->clear();
-    //controller->render();
 
 }
