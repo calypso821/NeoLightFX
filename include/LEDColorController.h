@@ -23,7 +23,7 @@ public:
     LEDColorController(int ledNum_width, int ledNum_height, bool showBotttom);
     ~LEDColorController();
 
-    uint8_t* getColorArray();
+    uint32_t* getColorArray();
     int getColorArraySize();
 
     void setColorByName(Color color);
@@ -39,13 +39,12 @@ private:
     
 
     int m_colorArraySize;
-    uint8_t* m_pColorArray;
+    uint32_t* m_pColorArray;
 
     void initColorArray();
     void clearColorArray();
 
     void setStaticColor(uint32_t color);
-    //void setColorByArray();
 };
 
 #endif // LEDCOLORCONTROLLER_H

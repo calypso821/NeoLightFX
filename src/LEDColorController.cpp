@@ -33,8 +33,8 @@ void LEDColorController::initColorArray()
         size += m_ledNum_width;
     }
 
-    // Allocate color array memory (size * 3 -> RGB)
-    m_pColorArray = new uint8_t[size * 3];
+    // Allocate color array memory
+    m_pColorArray = new uint32_t[size];
 
     // Set array size
     m_colorArraySize = size;
@@ -42,10 +42,10 @@ void LEDColorController::initColorArray()
     
 void LEDColorController::clearColorArray()
 {
-    memset(m_pColorArray, 0, sizeof(uint8_t) * 3 * m_colorArraySize);
+    memset(m_pColorArray, 0, sizeof(uint32_t) * m_colorArraySize);
 }
 
-uint8_t* LEDColorController::getColorArray()
+uint32_t* LEDColorController::getColorArray()
 {
     return m_pColorArray;
 }
@@ -57,15 +57,9 @@ int LEDColorController::getColorArraySize()
 
 void LEDColorController::setStaticColor(uint32_t color)
 {
-    uint8_t red = (color >> 16) & 0xFF;
-    uint8_t green = (color >> 8) & 0xFF;
-    uint8_t blue = color & 0xFF;
-
     for (int i = 0; i < m_colorArraySize; ++i)
     {
-        m_pColorArray[i * 3] = red;
-        m_pColorArray[i * 3 + 1] = green;
-        m_pColorArray[i * 3 + 2] = blue;
+        m_pColorArray[i] = color;
     }
 }
 

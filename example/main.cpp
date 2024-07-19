@@ -1,24 +1,23 @@
 #include <iostream>
+#include <iomanip>
+
 #include "LEDColorController.h"
 
 static const int LEDS_WIDTH = 45;
 static const int LEDS_HEIGHT = 18;
 static const bool SHOW_BOTTOM = false;
 
-static void printElements(uint8_t* pArr, int offset, int length)
+static void printElements(uint32_t* pArr, int offset, int length)
 {
     for (int i = 0; i < length; ++i)
     {
-        int i_ele = offset * 3 + i * 3;
-        std::cout << static_cast<int>(pArr[i_ele]) << ".";
-        std::cout << static_cast<int>(pArr[i_ele + 1]) << ".";
-        std::cout << static_cast<int>(pArr[i_ele + 2]) << ", ";
+        std::cout << "0x" << std::hex << std::setw(6) << std::setfill('0') << pArr[offset + i] << " ";
     }
-    std::cout << std::endl;
+    std::cout << std::dec << std::endl;
 }
 
 
-static void printColorArray(uint8_t* pArr)
+static void printColorArray(uint32_t* pArr)
 {
     int offset = 0;
 
@@ -51,7 +50,7 @@ int main()
     // Initialize LEDColorController with the desired width, height, and brightness
 
     LEDColorController lcc = LEDColorController(LEDS_WIDTH, LEDS_HEIGHT, SHOW_BOTTOM);
-    uint8_t* pArr = lcc.getColorArray();
+    uint32_t* pArr = lcc.getColorArray();
 
     lcc.setColorByHexCode(0x00FFFF);
     lcc.setColorByName(Color::Red);
