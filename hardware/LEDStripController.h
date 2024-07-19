@@ -13,8 +13,8 @@ public:
     virtual void init() = 0;
     virtual void render() = 0;
 
-    virtual void led_array_setColor(uint32_t* colorArray) = 0;
-    virtual void led_array_clear() = 0;
+    virtual void ledArraySetColor(uint32_t* colorArray) = 0;
+    virtual void ledArrayClear() = 0;
     virtual void setBrightness(int brightness) = 0;
 
 protected:
