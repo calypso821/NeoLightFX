@@ -34,15 +34,6 @@ void ImageProcessor::init(int width, int height)
     m_blackBar_height = height * BLACK_BAR_RATIO;
     m_blackBarOffset = 0;
     m_transitionSpeed = 1;
-
-
-    /*this->patch_width = width / LED_WIDTH;
-    this->patch_height = height / LED_HEIGHT;
-    this->patch_width_length = height * HEIGHT_PATCH_SIZE;
-    this->patch_height_length = width * WIDTH_PATCH_SIZE;
-    this->padding = 0;
-    this->black_bars_height = height * BLACK_BARS_SIZE;
-    this->averaging = 4;*/
 }
 
 int ImageProcessor::getMeanBlack(cv::Mat blackBar)
@@ -88,37 +79,25 @@ void ImageProcessor::processBlackBars(cv::Mat source) {
     }
 }
 
-void ImageProcessor::call(cv::Mat frame, ws2811_led_t* led_array) {
-    processBlackBars(frame);
-    processHorizontal(led_array, frame);
-    processVertical(led_array, frame);
-}
-
-int ImageProcessor::getColor(cv::Scalar avg) {
-    int red = static_cast<int>(avg[2]);
-    int green = static_cast<int>(avg[1]);
-    int blue = static_cast<int>(avg[0]);
-    return (red << 16) + (green << 8) + blue;
-}
-
-int ImageProcessor::getMean(int old_color, cv::Scalar avg, int num) {
-    int red_n = static_cast<int>(avg[2]);
-    int green_n = static_cast<int>(avg[1]);
-    int blue_n = static_cast<int>(avg[0]);
-
-    if (num != 0) {
-        int red_o = old_color >> 16 & 0xFF;
-        int green_o = old_color >> 8 & 0xFF;
-        int blue_o = old_color & 0xFF;
-
-        for (int i = 0; i < num; i++) {
-            red_n = (red_o + red_n) / 2;
-            green_n = (green_o + green_n) / 2;
-            blue_n = (blue_o + blue_n) / 2;
-        }
-    }
-    return (red_n << 16) + (green_n << 8) + blue_n;
-}
+// TODO: Transition
+//int ImageProcessor::getMean(int old_color, cv::Scalar avg, int num) {
+//    int red_n = static_cast<int>(avg[2]);
+//    int green_n = static_cast<int>(avg[1]);
+//    int blue_n = static_cast<int>(avg[0]);
+//
+//    if (num != 0) {
+//        int red_o = old_color >> 16 & 0xFF;
+//        int green_o = old_color >> 8 & 0xFF;
+//        int blue_o = old_color & 0xFF;
+//
+//        for (int i = 0; i < num; i++) {
+//            red_n = (red_o + red_n) / 2;
+//            green_n = (green_o + green_n) / 2;
+//            blue_n = (blue_o + blue_n) / 2;
+//        }
+//    }
+//    return (red_n << 16) + (green_n << 8) + blue_n;
+//}
 
 uint32_t ImageProcessor::toUint32Color(cv::Scalar color)
 {
@@ -200,4 +179,14 @@ void ImageProcessor::processVertical(uint32_t* array, cv::Mat source)
         //array[pos_r + i] = getMean(array[pos_r + i], avg_right, averaging);
         array[pos_r + i] = toUint32Color(meanColor_right);
     }
+}
+
+void ImageProcessor::processSource(uint32_t* colorArray, cv::Mat source)
+{
+    if (DETECT_BLACK_BARS) {
+        processBlackBars(source);
+    }
+
+    processHorizontal(colorArray, source);
+    processVertical(colorArray, source);
 }
