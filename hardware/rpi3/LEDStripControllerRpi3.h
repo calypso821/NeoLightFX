@@ -16,12 +16,12 @@ public:
 	void init() override;
 	void render() override;
 
-	void led_array_setColor(uint32_t* colorArray) override;
-	void led_array_clear() override;
+	void ledArraySetColor(uint32_t* colorArray) override;
+	void ledArrayClear() override;
 	void setBrightness(int brightness) override;
 
 private:
-	ws2811_t led_array;
+	ws2811_t m_ledArray;
 };
 
 #endif // LEDSTRIPCONTROLLERRPI3_H

@@ -16,11 +16,12 @@ LEDStripControllerRpi3::LEDStripControllerRpi3(int ledCount)
 LEDStripControllerRpi3::~LEDStripControllerRpi3()
 {
     // Clean up ws2811 resources
-    ws2811_fini(&led_array);
+    ws2811_fini(&m_ledArray);
+    std::cout << "LED strip ws2811 resource release: Success" << std::endl;
 }
 
 void LEDStripControllerRpi3::init() {
-    led_array =
+    m_ledArray =
     {
         .freq = TARGET_FREQ,
         .dmanum = DMA,
@@ -32,33 +33,31 @@ void LEDStripControllerRpi3::init() {
                 .invert = 0,
                 .count = m_ledCount,
                 .strip_type = STRIP_TYPE,
-                .brightness = 100,
+                .brightness = 255,
             },
         },
     };
     
-    ws2811_return_t ret = ws2811_init(&led_array);
+    ws2811_return_t ret = ws2811_init(&m_ledArray);
 
 
     if (ret != WS2811_SUCCESS) {
         throw std::runtime_error(std::string("LED strip ws2811 init failed: ")
          + ws2811_get_return_t_str(ret));
     } else {
-        std::cout << "LED strip ws2811 init: "
-        << ws2811_get_return_t_str(ret) << std::endl;
+        std::cout << "LED strip ws2811 init: " << ws2811_get_return_t_str(ret) << std::endl;
     }
     
     // Check if memory was allocated for leds
-    if (!led_array.channel[0].leds) {
-        std::cerr << "Memory allocation for LEDs failed" << std::endl;
-        throw std::runtime_error("Memory allocation for LEDs failed");
+    if (!m_ledArray.channel[0].leds) {
+        throw std::runtime_error("Memory allocation for LEDs: Fail");
     } else {
-        std::cout << "Memory for LEDs successfully allocated" << std::endl;
+        std::cout << "Memory allocation for LEDs: Success" << std::endl;
     }
 }
 
 void LEDStripControllerRpi3::render() {
-    ws2811_return_t ret = ws2811_render(&led_array);
+    ws2811_return_t ret = ws2811_render(&m_ledArray);
     //std::cout << "Redner status: " << ret << std::endl;
     
     if (ret != WS2811_SUCCESS)
@@ -67,16 +66,16 @@ void LEDStripControllerRpi3::render() {
     }
 }
 
-void LEDStripControllerRpi3::led_array_setColor(uint32_t* colorArray)
+void LEDStripControllerRpi3::ledArraySetColor(uint32_t* colorArray)
 {
     for (int x = 0; x < m_ledCount; x++) {
-        led_array.channel[0].leds[x] = colorArray[x];
+        m_ledArray.channel[0].leds[x] = colorArray[x];
     }
 }
 
-void LEDStripControllerRpi3::led_array_clear()
+void LEDStripControllerRpi3::ledArrayClear()
 {
-    memset(led_array.channel[0].leds, 0, m_ledCount * sizeof(uint32_t));
+    memset(m_ledArray.channel[0].leds, 0, m_ledCount * sizeof(uint32_t));
 }
 
 void LEDStripControllerRpi3::setBrightness(int brightness)
