@@ -1,7 +1,7 @@
 #include <iostream>
 #include <iomanip>
 
-#include "LEDColorController.h"
+#include "controllers/LEDColorController.h"
 
 static const int LEDS_WIDTH = 45;
 static const int LEDS_HEIGHT = 18;

@@ -1,5 +1,5 @@
 #include <cstring>
-#include "LEDColorController.h"
+#include "controllers/LEDColorController.h"
 
 LEDColorController::LEDColorController(int ledNum_width, int ledNum_height, bool showBottom)
 {
@@ -71,6 +71,11 @@ void LEDColorController::setColorByName(Color color)
 void LEDColorController::setColorByHexCode(uint32_t color)
 {
     setStaticColor(color);
+}
+
+void LEDColorController::setColorBySource(cv::Mat frame)
+{
+    int test = 10;
 }
 
 //void LEDColorController::setColorByName(Color color)

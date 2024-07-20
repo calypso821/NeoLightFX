@@ -1,10 +1,8 @@
 #ifndef LEDCOLORCONTROLLER_H
 #define LEDCOLORCONTROLLER_H
 
-// #include "FrameProcessor.h"
-// #include "StaticColor.h"
-// #include <ws2811.h>
-// #include <opencv2/opencv.hpp>
+//#include <opencv2/opencv.hpp>
+#include <opencv2/core/mat.hpp>  // Specific header for cv::Mat
 #include <cstdint>
 
 enum class Color {
@@ -28,6 +26,7 @@ public:
 
     void setColorByName(Color color);
     void setColorByHexCode(uint32_t color);
+    void setColorBySource(cv::Mat frame);
 
 private:
     int m_ledNum_width;

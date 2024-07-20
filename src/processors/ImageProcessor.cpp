@@ -1,4 +1,4 @@
-#include "ImageProcessor.h"
+#include "processors/ImageProcessor.h"
 
 //TODO: Input paramter
 #define LED_WIDTH   50
