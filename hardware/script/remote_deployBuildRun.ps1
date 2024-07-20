@@ -18,7 +18,12 @@ mkdir -p ${remotePath}
 "@
 
     # SCP command to copy files
-    scp -r ${localProjectPath}/* ${remoteUser}@${remoteHost}:${remotePath}
+    #scp -r ${localProjectPath}/* ${remoteUser}@${remoteHost}:${remotePath}
+    scp -r ${localProjectPath}/CMakeLists.txt ${remoteUser}@${remoteHost}:${remotePath}
+    scp -r ${localProjectPath}/example ${remoteUser}@${remoteHost}:${remotePath}
+    scp -r ${localProjectPath}/hardware ${remoteUser}@${remoteHost}:${remotePath}
+    scp -r ${localProjectPath}/include ${remoteUser}@${remoteHost}:${remotePath}
+    scp -r ${localProjectPath}/src ${remoteUser}@${remoteHost}:${remotePath}
 
     # SSH command to build the project
     ssh -t ${remoteUser}@${remoteHost} @"

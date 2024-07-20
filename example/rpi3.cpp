@@ -29,7 +29,7 @@ int main()
     LEDColorController lcc = LEDColorController(LEDS_WIDTH, LEDS_HEIGHT, SHOW_BOTTOM);
     uint32_t* pColorArray = lcc.getColorArray();
 
-    lcc.setColorByHexCode(0xFFFFFF);
+    lcc.setColorByHexCode(0xFF0F00);
     //lcc.setColorByName(Color::Red);
     //lcc.setColorByName(Color::Green);
 
@@ -49,8 +49,8 @@ int main()
         usleep(1000000 / 15); // 15 frames per second
     }
 
-    controller->ledArrayClear();
-    controller->render();
+    //controller->ledArrayClear();
+    //controller->render();
 
     // Controller deconstructor called
     delete controller;

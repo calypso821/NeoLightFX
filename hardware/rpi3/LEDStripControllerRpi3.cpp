@@ -33,7 +33,7 @@ void LEDStripControllerRpi3::init() {
                 .invert = 0,
                 .count = m_ledCount,
                 .strip_type = STRIP_TYPE,
-                .brightness = 255,
+                .brightness = 150,
             },
         },
     };
