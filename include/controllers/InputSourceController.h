@@ -7,9 +7,11 @@
 class InputSourceController {
 public:
     InputSourceController(FrameSource* frameSource, LEDColorController* ledColorController);
+    void init();
     void start();
 
 private:
+    // TODO: Mybe change to 
     FrameSource* m_pFrameSource;
     LEDColorController* m_pLedColorController;
 };

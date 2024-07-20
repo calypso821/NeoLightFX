@@ -1,9 +1,12 @@
 #ifndef VIDEOSOURCE_H
 #define VIDEOSOURCE_H
 
-#include "sources/FrameSource.h"
-#include <opencv2/opencv.hpp>
 #include <string>
+
+#include <opencv2/opencv.hpp>
+
+#include "sources/FrameSource.h"
+
 
 class VideoSource : public FrameSource {
 public:
@@ -14,6 +17,7 @@ public:
     bool initVideoFile(const std::string& filename);
 
     bool getNextFrame(cv::Mat& frame) override;
+    std::pair<int, int> getResolution() const override;
 
 private:
     cv::VideoCapture cap;

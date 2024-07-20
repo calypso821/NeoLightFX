@@ -1,9 +1,11 @@
 #ifndef LEDCOLORCONTROLLER_H
 #define LEDCOLORCONTROLLER_H
 
-//#include <opencv2/opencv.hpp>
-#include <opencv2/core/mat.hpp>  // Specific header for cv::Mat
 #include <cstdint>
+
+#include <opencv2/core/mat.hpp>
+
+#include "processors/ImageProcessor.h"
 
 enum class Color {
     Red = 0xFF0000,
@@ -14,12 +16,13 @@ enum class Color {
 };
 
 
-
 class LEDColorController 
 {
 public:
     LEDColorController(int ledNum_width, int ledNum_height, bool showBotttom);
     ~LEDColorController();
+
+    void initImageProcessor(int width, int height);
 
     uint32_t* getColorArray();
     int getColorArraySize();
@@ -35,7 +38,8 @@ private:
     int m_brightness;
     bool m_showBottom;
 
-    
+
+    ImageProcessor m_imageProcessor;
 
     int m_colorArraySize;
     uint32_t* m_pColorArray;

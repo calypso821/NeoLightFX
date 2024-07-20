@@ -57,6 +57,12 @@ bool VideoSource::initVideoFile(const std::string& filename)
     return true;
 }
 
+std::pair<int, int> VideoSource::getResolution() const {
+    int width = static_cast<int>(cap.get(cv::CAP_PROP_FRAME_WIDTH));
+    int height = static_cast<int>(cap.get(cv::CAP_PROP_FRAME_HEIGHT));
+    return { width, height };
+}
+
 bool VideoSource::getNextFrame(cv::Mat& frame) {
     cap >> frame;
     return !frame.empty();

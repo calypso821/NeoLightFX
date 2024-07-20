@@ -24,12 +24,14 @@ file(GLOB_RECURSE SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
 add_executable(runExampleApp
     example/main.cpp
     src/controllers/LEDColorController.cpp
+    src/processors/ImageProcessor.cpp
 )
 
 add_executable(runInputSource 
     example/inputSource.cpp
     src/controllers/LEDColorController.cpp
     src/controllers/InputSourceController.cpp
+    src/processors/ImageProcessor.cpp
     src/sources/VideoSource.cpp
     src/sources/ImageSource.cpp
 )

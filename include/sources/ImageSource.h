@@ -10,6 +10,7 @@ class ImageSource : public FrameSource {
 public:
     ImageSource(const std::string& filename);
     bool getNextFrame(cv::Mat& frame) override;
+    std::pair<int, int> getResolution() const override;
 
 private:
     cv::Mat image;

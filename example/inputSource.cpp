@@ -31,6 +31,7 @@ int main() {
     VideoSource captureCardSource;
     if (captureCardSource.initCaptureCard(0)) { // assuming device 0
         InputSourceController captureCardController(&captureCardSource, &lcc);
+        captureCardController.init();
         captureCardController.start();
     }
 

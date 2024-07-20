@@ -24,14 +24,14 @@ void ImageProcessor::init(int width, int height)
     m_height = height;
 
     // On Left, Right
-    m_verticalPatch_width = width * WIDTH_PATCH_RATIO;
-    m_verticalPatch_height = height / m_ledNum_height;
+    m_verticalPatch_width = static_cast<int>(width * WIDTH_PATCH_RATIO);
+    m_verticalPatch_height = static_cast<int>(height / m_ledNum_height);
 
     // On Top, Bottom
-    m_horizontalPatch_width = width / m_ledNum_width;
-    m_horizontalPatch_height = height * HEIGHT_PATCH_RATIO;
+    m_horizontalPatch_width = static_cast<int>(width / m_ledNum_width);
+    m_horizontalPatch_height = static_cast<int>(height * HEIGHT_PATCH_RATIO);
 
-    m_blackBar_height = height * BLACK_BAR_RATIO;
+    m_blackBar_height = static_cast<int>(height * BLACK_BAR_RATIO);
     m_blackBarOffset = 0;
     m_transitionSpeed = 1;
 }
@@ -39,7 +39,7 @@ void ImageProcessor::init(int width, int height)
 int ImageProcessor::getMeanBlack(cv::Mat blackBar)
 {
     cv::Scalar meanBackBar = cv::mean(blackBar);
-    return (meanBackBar[0] + meanBackBar[1] + meanBackBar[2]) / 3;
+    return static_cast<int>((meanBackBar[0] + meanBackBar[1] + meanBackBar[2]) / 3);
 }
 
 bool ImageProcessor::detectBlackBars(cv::Mat blackBar_top, cv::Mat blackBar_bot)
@@ -50,16 +50,16 @@ bool ImageProcessor::detectBlackBars(cv::Mat blackBar_top, cv::Mat blackBar_bot)
     return (blackBarMean_top < 6 && blackBarMean_bot < 6);
 }
 
-void ImageProcessor::processBlackBars(cv::Mat source) {
+void ImageProcessor::processBlackBars(cv::Mat frame) {
     // Top side patch 
-    cv::Mat blackBar_top = source(cv::Rect(
+    cv::Mat blackBar_top = frame(cv::Rect(
         0, 
         0,
         m_width,
         m_blackBar_height
     ));
     // Bottom side patch
-    cv::Mat blackBar_bot = source(cv::Rect(
+    cv::Mat blackBar_bot = frame(cv::Rect(
         0,
         m_height - m_blackBar_height,
         m_width,
@@ -70,12 +70,12 @@ void ImageProcessor::processBlackBars(cv::Mat source) {
     {
         m_blackBarOffset = m_blackBar_height;
         int new_height = m_height - 2 * m_blackBar_height;
-        m_horizontalPatch_height = new_height * HEIGHT_PATCH_RATIO;
+        m_horizontalPatch_height = static_cast<int>(new_height * HEIGHT_PATCH_RATIO);
     }
     else 
     {
         m_blackBarOffset = 0;
-        m_horizontalPatch_height = height * HEIGHT_PATCH_RATIO;
+        m_horizontalPatch_height = static_cast<int>(m_height * HEIGHT_PATCH_RATIO);
     }
 }
 
@@ -109,7 +109,7 @@ uint32_t ImageProcessor::toUint32Color(cv::Scalar color)
     return (red << 16) | (green << 8) | blue;
 }
 
-void ImageProcessor::processHorizontal(uint32_t* array, cv::Mat source)
+void ImageProcessor::processHorizontal(uint32_t* array, cv::Mat frame)
 {
     int patch_width = m_horizontalPatch_width;
     int patch_height = m_horizontalPatch_height;
@@ -146,7 +146,7 @@ void ImageProcessor::processHorizontal(uint32_t* array, cv::Mat source)
     }
 }
 
-void ImageProcessor::processVertical(uint32_t* array, cv::Mat source)
+void ImageProcessor::processVertical(uint32_t* array, cv::Mat frame)
 {
     int patch_width = m_verticalPatch_width;
     int patch_height = m_verticalPatch_height;
@@ -155,7 +155,7 @@ void ImageProcessor::processVertical(uint32_t* array, cv::Mat source)
     {
         // Left side (Bottom -> Top)
         int i_inverse = m_ledNum_height - 1 - i;
-        cv::Mat patch_left = source(cv::Rect(
+        cv::Mat patch_left = frame(cv::Rect(
             0,
             i_inverse * patch_height,
             patch_width,
@@ -181,12 +181,13 @@ void ImageProcessor::processVertical(uint32_t* array, cv::Mat source)
     }
 }
 
-void ImageProcessor::processSource(uint32_t* colorArray, cv::Mat source)
+void ImageProcessor::processFrame(uint32_t* colorArray, cv::Mat frame)
 {
+    std::cout << "Processing frame..." << std::endl;
     if (DETECT_BLACK_BARS) {
-        processBlackBars(source);
+        processBlackBars(frame);
     }
 
-    processHorizontal(colorArray, source);
-    processVertical(colorArray, source);
+    processHorizontal(colorArray, frame);
+    processVertical(colorArray, frame);
 }

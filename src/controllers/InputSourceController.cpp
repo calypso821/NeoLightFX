@@ -5,6 +5,12 @@
 InputSourceController::InputSourceController(FrameSource* frameSource, LEDColorController* ledColorController)
     : m_pFrameSource(frameSource), m_pLedColorController(ledColorController) {}
 
+void InputSourceController::init()
+{
+    std::pair<int, int> res = m_pFrameSource->getResolution();
+    m_pLedColorController->initImageProcessor(res.first, res.second);
+}
+
 void InputSourceController::start()
 {
     cv::Mat frame;

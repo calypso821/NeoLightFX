@@ -7,7 +7,8 @@
 class ImageProcessor {
 public:
     ImageProcessor(int ledNum_width, int ledNum_height, bool botttom);
-    void processSource(uint32_t* colorArray, cv::Mat source);
+    void init(int width, int height);
+    void processFrame(uint32_t* colorArray, cv::Mat frame);
 
 private:
     static const float HEIGHT_PATCH_RATIO;  // % of height
@@ -33,12 +34,12 @@ private:
 
     int getMeanBlack(cv::Mat blackBar);
     bool detectBlackBars(cv::Mat blackBar_top, cv::Mat blackBar_bot);
-    void processBlackBars(cv::Mat source);
+    void processBlackBars(cv::Mat frame);
 
     //int getMean(int oldColor, cv::Scalar avg, int num);
     uint32_t toUint32Color(cv::Scalar color);
-    void processHorizontal(uint32_t* colorArray, cv::Mat source);
-    void processVertical(uint32_t* colorArray, cv::Mat source);
+    void processHorizontal(uint32_t* colorArray, cv::Mat frame);
+    void processVertical(uint32_t* colorArray, cv::Mat frame);
 
 };
 

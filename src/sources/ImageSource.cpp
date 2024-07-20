@@ -14,6 +14,12 @@ ImageSource::ImageSource(const std::string& filename) : frameReturned(false) {
     std::cout << "Image initialization: Success" << std::endl;
 }
 
+std::pair<int, int> ImageSource::getResolution() const {
+    int width = static_cast<int>(image.cols);
+    int height = static_cast<int>(image.rows);
+    return { width, height };
+}
+
 bool ImageSource::getNextFrame(cv::Mat& frame) {
     // Frame already returned
     if (frameReturned) {
