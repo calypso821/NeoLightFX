@@ -1,13 +1,19 @@
 #include <cstring>
-#include "LEDColorController.h"
+
+#include "controllers/LEDColorController.h"
+
 
 LEDColorController::LEDColorController(int ledNum_width, int ledNum_height, bool showBottom)
+    : m_imageProcessor(ledNum_width, ledNum_height, showBottom),
+    m_ledNum_width(ledNum_width),
+    m_ledNum_height(ledNum_height),
+    m_showBottom(showBottom)
 {
 
-    m_ledNum_width = ledNum_width;
-    m_ledNum_height = ledNum_height;
+    //m_ledNum_width = ledNum_width;
+    //m_ledNum_height = ledNum_height;
 
-    m_showBottom = showBottom;
+   //m_showBottom = showBottom;
 
     m_brightness = 100;
     
@@ -15,7 +21,6 @@ LEDColorController::LEDColorController(int ledNum_width, int ledNum_height, bool
     // Init color array (allocate memory)
     initColorArray();
     clearColorArray();
-
 }
 
 // Destructor (invoked when object is destryed)
@@ -23,6 +28,13 @@ LEDColorController::~LEDColorController()
 {
     // Free the allocated memory
     delete[] m_pColorArray;
+}
+
+void LEDColorController::initImageProcessor(int width, int height)
+{
+    // INIT ImageProcessor
+    //m_imageProcessor = ImageProcessor(m_ledNum_width, m_ledNum_height, m_showBottom);
+    m_imageProcessor.init(width, height);
 }
 
 void LEDColorController::initColorArray()
@@ -71,6 +83,11 @@ void LEDColorController::setColorByName(Color color)
 void LEDColorController::setColorByHexCode(uint32_t color)
 {
     setStaticColor(color);
+}
+
+void LEDColorController::setColorBySource(cv::Mat frame)
+{
+    m_imageProcessor.processFrame(m_pColorArray, frame);
 }
 
 //void LEDColorController::setColorByName(Color color)
