@@ -4,7 +4,7 @@
 // #include "FrameProcessor.h"
 // #include "StaticColor.h"
 // #include <ws2811.h>
-// #include <opencv2/opencv.hpp>
+#include <opencv2/opencv.hpp>
 #include <cstdint>
 
 enum class Color {
