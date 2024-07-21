@@ -42,7 +42,7 @@ bool VideoSource::initVideoFile(const std::string& filename)
 
     cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
     cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
-    cap.set(cv::CAP_PROP_FPS, 15);
+    cap.set(cv::CAP_PROP_FPS, 60);
 
     // Verify properties
     double width = cap.get(cv::CAP_PROP_FRAME_WIDTH);

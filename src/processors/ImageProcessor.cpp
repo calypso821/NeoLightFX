@@ -7,7 +7,7 @@
 
 // Define the static constants
 const float ImageProcessor::HEIGHT_PATCH_RATIO = 0.2f; // 30% of height
-const float ImageProcessor::WIDTH_PATCH_RATIO = 0.3f;  // 30% of width
+const float ImageProcessor::WIDTH_PATCH_RATIO = 0.2f;  // 30% of width
 const float ImageProcessor::BLACK_BAR_RATIO = 0.125f;   // 10% of height
 
 ImageProcessor::ImageProcessor(int ledNum_width, int ledNum_height, bool botttom)
@@ -101,9 +101,9 @@ void ImageProcessor::processBlackBars(cv::Mat frame) {
 
 uint32_t ImageProcessor::toUint32Color(cv::Scalar color)
 {
-    uint8_t red = static_cast<uint8_t>(color[2]);
+    uint8_t red = static_cast<uint8_t>(color[0]);
     uint8_t green = static_cast<uint8_t>(color[1]);
-    uint8_t blue = static_cast<uint8_t>(color[0]);
+    uint8_t blue = static_cast<uint8_t>(color[2]);
 
     // TODO: How this works? 
     return (red << 16) | (green << 8) | blue;
@@ -130,7 +130,7 @@ void ImageProcessor::processHorizontal(uint32_t* array, cv::Mat frame)
 
         if (m_bottom)
         {
-            // Bottom side (Right -> Left)
+            // Bottom side (Left <- Right)
             int i_inverse = m_ledNum_width - 1 - i;
             cv::Mat patch_bot = frame(cv::Rect(
                 i_inverse * patch_width,
@@ -138,7 +138,7 @@ void ImageProcessor::processHorizontal(uint32_t* array, cv::Mat frame)
                 patch_width,
                 patch_height
             ));
-            cv::Scalar meanColor_bot = cv::mean(patch_top);
+            cv::Scalar meanColor_bot = cv::mean(patch_bot);
             int pos_b = m_ledNum_height * 2 + m_ledNum_width;
             //array[pos_b + i] = getMean(array[pos_b + i], avg_bot, averaging);
             array[pos_b + i] = toUint32Color(meanColor_bot);
@@ -183,7 +183,6 @@ void ImageProcessor::processVertical(uint32_t* array, cv::Mat frame)
 
 void ImageProcessor::processFrame(uint32_t* colorArray, cv::Mat frame)
 {
-    std::cout << "Processing frame..." << std::endl;
     if (DETECT_BLACK_BARS) {
         processBlackBars(frame);
     }

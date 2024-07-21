@@ -6,6 +6,10 @@
 #include <Windows.h>
 //#include <unistd.h>
 
+#include "sources/VideoSource.h"
+#include "sources/ImageSource.h"
+#include "controllers/InputSourceController.h"
+#include "controllers/LEDColorController.h"
 
 volatile bool keepRunning = true;
 
@@ -14,7 +18,7 @@ void signalHandler(int signum) {
     keepRunning = false;
 }
 
-#include "LEDColorController.h"
+#include "controllers/LEDColorController.h"
 
 
 // Function to simulate the LED display around the frame
@@ -226,21 +230,36 @@ int main() {
     signal(SIGINT, signalHandler);
 
 	// Example usage
-	int ledNumWidth = 10;  // Number of LEDs horizontally
-	int ledNumHeight = 6; // Number of LEDs vertically
+	int ledNumWidth = 18;  // Number of LEDs horizontally
+	int ledNumHeight = 10; // Number of LEDs vertically
 	int totalLEDs = 2 * ledNumWidth + 2 * ledNumHeight;
     bool showBottom = true;
+
+    // Init vide
+    VideoSource videoFileSource;
+    videoFileSource.initVideoFile("D:/resources/videos/OW_Widow.mp4");
 
 	// Initialize LED color controller
 	LEDColorController lcc = LEDColorController(ledNumWidth, ledNumHeight, showBottom);
 
+    std::pair<int, int> res = videoFileSource.getResolution();
+    
+
+
 	// Get array of colors
 	uint32_t* pColorArray = lcc.getColorArray();
 
+    int targetWidth = 1280;
+    int targetHeight = 720;
+    double targetFPS = 15.0;
+
+    lcc.initImageProcessor(targetWidth, targetHeight);
+
+    cv::Size targetSize(targetWidth, targetHeight);
+    cv::Mat frame, resizedFrame;
 
 	// Choose between using a static color or an actual frame
-	bool useStaticColor = true; // Set this to false if you want to use a real frame
-	cv::Mat frame;
+	bool useStaticColor = false; // Set this to false if you want to use a real frame
 
 	if (useStaticColor) {
 		uint32_t staticColor = 0xFF0000; // Example: Red color
@@ -248,25 +267,32 @@ int main() {
 		frame = createSolidColorFrame(320, 140, staticColor); // Create a solid color frame
 	}
 	else {
-		frame = cv::imread("D:/resources/pictures/test.jpg"); // Replace with actual frame source
-		if (frame.empty()) {
-			std::cerr << "Error: Could not read the image." << std::endl;
-			return -1;
-		}
+		//frame = cv::imread("D:/resources/pictures/test.jpg"); // Replace with actual frame source
+		//if (frame.empty()) {
+		//	std::cerr << "Error: Could not read the image." << std::endl;
+		//	return -1;
+		//}
 	}
 
 	while (keepRunning) {
+        
+        videoFileSource.getNextFrame(frame);
+
+        // Resize the frame to the desired resolution
+        cv::resize(frame, resizedFrame, targetSize);
+
+        lcc.setColorBySource(resizedFrame);
 		// Process the frame with your ImageProcessor logic
 		// ImageProcessor::processframe(colorArray, frame); // Uncomment and implement this line with your logic
 
 		// Simulate the LEDs around the frame
-		simulateLEDs(frame, pColorArray, ledNumWidth, ledNumHeight, showBottom);
+		simulateLEDs(resizedFrame, pColorArray, ledNumWidth, ledNumHeight, showBottom);
 
 		// Read next frame (for demonstration, just repeat the same frame)
 		// frame = ...; // Replace with code to capture the next frame
 
         // Add a delay of 100 milliseconds (adjust as needed)
-        Sleep(100); // 100 milliseconds
+        //Sleep(1000 / 120); // 100 milliseconds
         //usleep(100000); // 100000 microseconds = 100 milliseconds
 
 	}

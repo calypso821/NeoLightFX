@@ -28,20 +28,21 @@ int main() {
     //ImageProcessor imageProcessor(&ledColorController);
 
     // Capture card source object
-    VideoSource captureCardSource;
-    if (captureCardSource.initCaptureCard(0)) { // assuming device 0
-        InputSourceController captureCardController(&captureCardSource, &lcc);
-        captureCardController.init();
-        captureCardController.start();
-    }
+    //VideoSource captureCardSource;
+    //if (captureCardSource.initCaptureCard(0)) { // assuming device 0
+    //    InputSourceController captureCardController(&captureCardSource, &lcc);
+    //    captureCardController.init();
+    //    captureCardController.start();
+    //}
 
     // Video source object
-    /*VideoSource videoFileSource;
+    VideoSource videoFileSource;
     bool video_init_status = videoFileSource.initVideoFile("D:/resources/videos/Ambilight.mp4");
     if (video_init_status) {
         InputSourceController videoFileController(&videoFileSource, &lcc);
+        videoFileController.init();
         videoFileController.start();
-    }*/
+    }
 
 
    // Image source object 
