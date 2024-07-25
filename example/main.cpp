@@ -49,7 +49,7 @@ int main()
 {
     // Initialize LEDColorController with the desired width, height, and brightness
 
-    LEDColorController lcc = LEDColorController(LEDS_WIDTH, LEDS_HEIGHT, SHOW_BOTTOM);
+    /*LEDColorController lcc = LEDColorController(LEDS_WIDTH, LEDS_HEIGHT, SHOW_BOTTOM);
     uint32_t* pArr = lcc.getColorArray();
 
     lcc.setColorByHexCode(0x00FFFF);
@@ -57,7 +57,7 @@ int main()
     lcc.setColorByName(Color::Green);
 
     printColorArray(pArr);
-
+*/
 
     return 0;
 }

@@ -1,12 +1,12 @@
-#ifndef IMAGEPROCESSOR_H
-#define IMAGEPROCESSOR_H
+#ifndef FRAMEPROCESSOR_H
+#define FRAMEPROCESSOR_H
 
 #include <opencv2/opencv.hpp>
 #include <cstdint>
 
-class ImageProcessor {
+class FrameProcessor {
 public:
-    ImageProcessor(int ledNum_width, int ledNum_height, bool botttom);
+    FrameProcessor(int ledNum_width, int ledNum_height, bool botttom);
     void init(int width, int height);
     void processFrame(uint32_t* colorArray, cv::Mat frame);
 
@@ -43,4 +43,4 @@ private:
 
 };
 
-#endif // IMAGEPROCESSOR_H
+#endif // FRAMEPROCESSOR_H

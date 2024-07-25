@@ -18,6 +18,7 @@ public:
 
     bool getNextFrame(cv::Mat& frame) override;
     std::pair<int, int> getResolution() const override;
+    float getFPS() override;
 
 private:
     cv::VideoCapture cap;

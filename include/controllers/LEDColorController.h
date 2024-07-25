@@ -5,16 +5,7 @@
 
 #include <opencv2/core/mat.hpp>
 
-#include "processors/ImageProcessor.h"
-
-enum class Color {
-    Red = 0xFF0000,
-    Green = 0x00FF00,
-    Blue = 0x0000FF,
-    White = 0xFFFFFF,
-    Black = 0x000000
-};
-
+#include "FrameProcessor.h"
 
 class LEDColorController 
 {
@@ -22,14 +13,17 @@ public:
     LEDColorController(int ledNum_width, int ledNum_height, bool showBotttom);
     ~LEDColorController();
 
-    void initImageProcessor(int width, int height);
+    void initFrameProcessor(int width, int height);
 
     uint32_t* getColorArray();
     int getColorArraySize();
+    bool getBottomStatus();
 
-    void setColorByName(Color color);
-    void setColorByHexCode(uint32_t color);
+    void setStaticColor(uint32_t color);
     void setColorBySource(cv::Mat frame);
+
+    //void setColorByName(Color color);
+    //void setColorByHexCode(uint32_t color);
 
 private:
     int m_ledNum_width;
@@ -39,15 +33,13 @@ private:
     bool m_showBottom;
 
 
-    ImageProcessor m_imageProcessor;
+    FrameProcessor m_frameProcessor;
 
     int m_colorArraySize;
     uint32_t* m_pColorArray;
 
     void initColorArray();
     void clearColorArray();
-
-    void setStaticColor(uint32_t color);
 };
 
 #endif // LEDCOLORCONTROLLER_H

@@ -1,11 +1,11 @@
-#include "sources/VideoSource.h"
-#include "sources/ImageSource.h"
-#include "controllers/InputSourceController.h"
-#include "controllers/LEDColorController.h"
-//#include "processors/ImageProcessor.h"
 #include <iostream>
 #include <filesystem>
-#include <opencv2/opencv.hpp>
+
+#include "controllers/InputSourceController.h"
+#include "controllers/LEDColorController.h"
+#include "sources/VideoSource.h"
+#include "sources/ImageSource.h"
+#include "renderManager.h"
 
 // Function to check available capture devices
 void checkAvailableDevices(int maxDevices = 10) {
@@ -43,6 +43,10 @@ int main() {
         videoFileController.init();
         videoFileController.start();
     }
+
+    // Redner Manager
+    RenderManager renderer = RenderManager();
+
 
 
    // Image source object 

@@ -10,6 +10,7 @@ public:
     virtual ~FrameSource() = default;
     virtual bool getNextFrame(cv::Mat& frame) = 0;
     virtual std::pair<int, int> getResolution() const = 0;
+    virtual float getFPS() = 0;
 };
 
 #endif // FRAMESOURCE_H

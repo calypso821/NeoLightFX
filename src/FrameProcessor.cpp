@@ -1,4 +1,4 @@
-#include "processors/ImageProcessor.h"
+#include "FrameProcessor.h"
 
 //TODO: Input paramter
 #define LED_WIDTH   50
@@ -6,11 +6,11 @@
 #define DETECT_BLACK_BARS  true
 
 // Define the static constants
-const float ImageProcessor::HEIGHT_PATCH_RATIO = 0.2f; // 30% of height
-const float ImageProcessor::WIDTH_PATCH_RATIO = 0.2f;  // 30% of width
-const float ImageProcessor::BLACK_BAR_RATIO = 0.125f;   // 10% of height
+const float FrameProcessor::HEIGHT_PATCH_RATIO = 0.2f; // 30% of height
+const float FrameProcessor::WIDTH_PATCH_RATIO = 0.2f;  // 30% of width
+const float FrameProcessor::BLACK_BAR_RATIO = 0.125f;   // 10% of height
 
-ImageProcessor::ImageProcessor(int ledNum_width, int ledNum_height, bool botttom)
+FrameProcessor::FrameProcessor(int ledNum_width, int ledNum_height, bool botttom)
 {
     m_ledNum_width = ledNum_width;
     m_ledNum_height = ledNum_height;
@@ -18,7 +18,7 @@ ImageProcessor::ImageProcessor(int ledNum_width, int ledNum_height, bool botttom
     m_bottom = botttom;
 }
 
-void ImageProcessor::init(int width, int height)
+void FrameProcessor::init(int width, int height)
 {
     m_width = width;
     m_height = height;
@@ -36,21 +36,21 @@ void ImageProcessor::init(int width, int height)
     m_transitionSpeed = 1;
 }
 
-int ImageProcessor::getMeanBlack(cv::Mat blackBar)
+int FrameProcessor::getMeanBlack(cv::Mat blackBar)
 {
     cv::Scalar meanBackBar = cv::mean(blackBar);
     return static_cast<int>((meanBackBar[0] + meanBackBar[1] + meanBackBar[2]) / 3);
 }
 
-bool ImageProcessor::detectBlackBars(cv::Mat blackBar_top, cv::Mat blackBar_bot)
+bool FrameProcessor::detectBlackBars(cv::Mat blackBar_top, cv::Mat blackBar_bot)
 {
-    int blackBarMean_top = ImageProcessor::getMeanBlack(blackBar_top);
-    int blackBarMean_bot = ImageProcessor::getMeanBlack(blackBar_bot);
+    int blackBarMean_top = FrameProcessor::getMeanBlack(blackBar_top);
+    int blackBarMean_bot = FrameProcessor::getMeanBlack(blackBar_bot);
 
     return (blackBarMean_top < 6 && blackBarMean_bot < 6);
 }
 
-void ImageProcessor::processBlackBars(cv::Mat frame) {
+void FrameProcessor::processBlackBars(cv::Mat frame) {
     // Top side patch 
     cv::Mat blackBar_top = frame(cv::Rect(
         0, 
@@ -80,7 +80,7 @@ void ImageProcessor::processBlackBars(cv::Mat frame) {
 }
 
 // TODO: Transition
-//int ImageProcessor::getMean(int old_color, cv::Scalar avg, int num) {
+//int FrameProcessor::getMean(int old_color, cv::Scalar avg, int num) {
 //    int red_n = static_cast<int>(avg[2]);
 //    int green_n = static_cast<int>(avg[1]);
 //    int blue_n = static_cast<int>(avg[0]);
@@ -99,7 +99,7 @@ void ImageProcessor::processBlackBars(cv::Mat frame) {
 //    return (red_n << 16) + (green_n << 8) + blue_n;
 //}
 
-uint32_t ImageProcessor::toUint32Color(cv::Scalar color)
+uint32_t FrameProcessor::toUint32Color(cv::Scalar color)
 {
     uint8_t red = static_cast<uint8_t>(color[0]);
     uint8_t green = static_cast<uint8_t>(color[1]);
@@ -109,7 +109,7 @@ uint32_t ImageProcessor::toUint32Color(cv::Scalar color)
     return (red << 16) | (green << 8) | blue;
 }
 
-void ImageProcessor::processHorizontal(uint32_t* array, cv::Mat frame)
+void FrameProcessor::processHorizontal(uint32_t* array, cv::Mat frame)
 {
     int patch_width = m_horizontalPatch_width;
     int patch_height = m_horizontalPatch_height;
@@ -146,7 +146,7 @@ void ImageProcessor::processHorizontal(uint32_t* array, cv::Mat frame)
     }
 }
 
-void ImageProcessor::processVertical(uint32_t* array, cv::Mat frame)
+void FrameProcessor::processVertical(uint32_t* array, cv::Mat frame)
 {
     int patch_width = m_verticalPatch_width;
     int patch_height = m_verticalPatch_height;
@@ -181,7 +181,7 @@ void ImageProcessor::processVertical(uint32_t* array, cv::Mat frame)
     }
 }
 
-void ImageProcessor::processFrame(uint32_t* colorArray, cv::Mat frame)
+void FrameProcessor::processFrame(uint32_t* colorArray, cv::Mat frame)
 {
     if (DETECT_BLACK_BARS) {
         processBlackBars(frame);

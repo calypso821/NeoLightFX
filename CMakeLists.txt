@@ -21,21 +21,30 @@ file(GLOB_RECURSE SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
 set(SOURCES 
     src/controllers/LEDColorController.cpp
     src/controllers/InputSourceController.cpp
-    src/processors/ImageProcessor.cpp
+    src/utils/SimulationUtils.cpp
     src/sources/VideoSource.cpp
     src/sources/ImageSource.cpp
+    src/FrameProcessor.cpp
+    src/RenderManager.cpp
+    src/Debug.cpp
 )
 
 # Add the source files to the example application executable
-#add_executable(runExampleApp examples/main.cpp ${SOURCES})
+
+add_executable(NeoLightFX_Simulator
+    main/main.cpp
+    ${SOURCES}
+)
+target_link_libraries(NeoLightFX_Simulator ${OpenCV_LIBS})
+#[[
 add_executable(runExampleApp 
-	example/main.cpp 
-	${SOURCES}
+    example/main.cpp 
+    ${SOURCES}
 )
 
 add_executable(simulationApp 
-	simulation/led_simulation.cpp
-	${SOURCES}
+    simulation/led_simulation.cpp
+    ${SOURCES}
 )
 
 add_executable(runInputSource 
@@ -44,9 +53,10 @@ add_executable(runInputSource
 )
 
 # Link OpenCV libraries using absolute path
-target_link_libraries(runInputSource ${OpenCV_LIBS})
-target_link_libraries(runExampleApp ${OpenCV_LIBS})
-target_link_libraries(simulationApp ${OpenCV_LIBS})
+# target_link_libraries(runInputSource ${OpenCV_LIBS})
+# target_link_libraries(runExampleApp ${OpenCV_LIBS})
+# target_link_libraries(simulationapp ${opencv_libs})
+]]
 
 # Add opencv.dll files to PATH!!
 # D:\repos\libs\opencv\build\x64\vc16\bin

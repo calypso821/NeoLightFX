@@ -67,3 +67,8 @@ bool VideoSource::getNextFrame(cv::Mat& frame) {
     cap >> frame;
     return !frame.empty();
 }
+
+float VideoSource::getFPS()
+{
+    return 29.8f;
+}

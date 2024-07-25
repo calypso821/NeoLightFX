@@ -8,7 +8,7 @@ InputSourceController::InputSourceController(FrameSource* frameSource, LEDColorC
 void InputSourceController::init()
 {
     std::pair<int, int> res = m_pFrameSource->getResolution();
-    m_pLedColorController->initImageProcessor(res.first, res.second);
+    m_pLedColorController->initFrameProcessor(res.first, res.second);
 }
 
 void InputSourceController::start()

@@ -1,37 +1,13 @@
-#include <opencv2/opencv.hpp>
-#include <vector>
-#include <cstdint>
-#include <iostream>
-#include <csignal>
-#include <Windows.h>
-//#include <unistd.h>
-
-#include "sources/VideoSource.h"
-#include "sources/ImageSource.h"
-#include "controllers/InputSourceController.h"
-#include "controllers/LEDColorController.h"
-
-volatile bool keepRunning = true;
-
-// Signal handler function
-void signalHandler(int signum) {
-    keepRunning = false;
-}
-
-#include "controllers/LEDColorController.h"
-
+#include "utils/SimulationUtils.h"
 
 // Function to simulate the LED display around the frame
-void simulateLEDs(const cv::Mat& frame, const uint32_t* colorArray, int ledNumWidth, int ledNumHeight, bool showBottom)
-{
+void simulateLEDs(const cv::Mat& frame, const uint32_t* colorArray, int ledNumWidth, int ledNumHeight, bool showBottom) {
     int width = frame.cols;
     int height = frame.rows;
 
     int verticalLedSize = height / ledNumHeight;
     int horizontalLedSize = width / ledNumWidth;
 
-    /*int borderSizeVertical = verticalLedSize * 2;
-    int borderSizeHorizontal = horizontalLedSize * 2;*/
     int borderThickness = 2; // Thickness of the border
     cv::Scalar borderColor = cv::Scalar(0, 0, 0); // White border
 
@@ -53,10 +29,7 @@ void simulateLEDs(const cv::Mat& frame, const uint32_t* colorArray, int ledNumWi
     int canvasHeight = frame.rows + horizontalLedSize * 2 + borderThickness * 2;
     cv::Mat canvas(canvasHeight, canvasWidth, CV_8UC3, cv::Scalar(0, 0, 0));
 
-    // Copy the frame to the center of the canvas
-    //frame.copyTo(canvas(cv::Rect(horizontalLedSize, verticalLedSize, frame.cols, frame.rows)));
-
-     // Copy the frame with border to the center of the canvas
+    // Copy the frame with border to the center of the canvas
     frameWithBorder.copyTo(canvas(cv::Rect(verticalLedSize, horizontalLedSize, frameWithBorder.cols, frameWithBorder.rows)));
 
     // Draw Top, Bottom
@@ -65,11 +38,11 @@ void simulateLEDs(const cv::Mat& frame, const uint32_t* colorArray, int ledNumWi
     for (int i = 0; i < ledNumWidth; ++i) {
         // Top side
         cv::rectangle(
-            canvas, 
+            canvas,
             // Area
             cv::Rect(
                 i * horizontalLedSize + verticalLedSize + borderThickness,
-                0, 
+                0,
                 horizontalLedSize,
                 horizontalLedSize
             ),
@@ -78,7 +51,7 @@ void simulateLEDs(const cv::Mat& frame, const uint32_t* colorArray, int ledNumWi
                 (colorArray[i + offset_t] >> 16) & 0xFF,
                 (colorArray[i + offset_t] >> 8) & 0xFF,
                 colorArray[i + offset_t] & 0xFF
-            ), 
+            ),
             cv::FILLED
         );
 
@@ -97,10 +70,8 @@ void simulateLEDs(const cv::Mat& frame, const uint32_t* colorArray, int ledNumWi
             borderThickness
         );
 
-
         // Bottom side
-        if (showBottom)
-        {
+        if (showBottom) {
             int i_inverse = ledNumWidth - 1 - i;
             cv::rectangle(
                 canvas,
@@ -134,20 +105,19 @@ void simulateLEDs(const cv::Mat& frame, const uint32_t* colorArray, int ledNumWi
                 borderThickness
             );
         }
-        
     }
 
     // Draw Left, Right
     int offset_l = 0;
     int offset_r = ledNumHeight + ledNumWidth;
     for (int i = 0; i < ledNumHeight; ++i) {
-        // ============ Left side =============
+        // Left side
         int i_inverse = ledNumHeight - 1 - i;
         cv::rectangle(
             canvas,
             // Area
             cv::Rect(
-                0, 
+                0,
                 i_inverse * verticalLedSize + horizontalLedSize + borderThickness,
                 verticalLedSize,
                 verticalLedSize
@@ -176,7 +146,7 @@ void simulateLEDs(const cv::Mat& frame, const uint32_t* colorArray, int ledNumWi
             borderThickness
         );
 
-        // ============ Right side =============
+        // Right side
         cv::rectangle(
             canvas,
             // Area
@@ -194,7 +164,6 @@ void simulateLEDs(const cv::Mat& frame, const uint32_t* colorArray, int ledNumWi
             ),
             cv::FILLED
         );
-        
 
         // Border
         cv::line(
@@ -217,85 +186,8 @@ void simulateLEDs(const cv::Mat& frame, const uint32_t* colorArray, int ledNumWi
     cv::waitKey(1); // Wait for a short period to update the display
 }
 
-
-
 // Function to create a solid color frame
 cv::Mat createSolidColorFrame(int width, int height, uint32_t color) {
-	cv::Mat frame(height, width, CV_8UC3, cv::Scalar((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF));
-	return frame;
-}
-
-int main() {
-    // Register the signal handler
- //   signal(SIGINT, signalHandler);
-
-	//// Example usage
-	//int ledNumWidth = 18;  // Number of LEDs horizontally
-	//int ledNumHeight = 10; // Number of LEDs vertically
-	//int totalLEDs = 2 * ledNumWidth + 2 * ledNumHeight;
- //   bool showBottom = true;
-
- //   // Init vide
- //   VideoSource videoFileSource;
- //   videoFileSource.initVideoFile("D:/resources/videos/OW_Widow.mp4");
-
-	//// Initialize LED color controller
-	//LEDColorController lcc = LEDColorController(ledNumWidth, ledNumHeight, showBottom);
-
- //   std::pair<int, int> res = videoFileSource.getResolution();
- //   
-
-
-	//// Get array of colors
-	//uint32_t* pColorArray = lcc.getColorArray();
-
- //   int targetWidth = 1280;
- //   int targetHeight = 720;
- //   double targetFPS = 15.0;
-
- //   lcc.initImageProcessor(targetWidth, targetHeight);
-
- //   cv::Size targetSize(targetWidth, targetHeight);
- //   cv::Mat frame, resizedFrame;
-
-	//// Choose between using a static color or an actual frame
-	//bool useStaticColor = false; // Set this to false if you want to use a real frame
-
-	//if (useStaticColor) {
-	//	uint32_t staticColor = 0xFF0000; // Example: Red color
-	//	lcc.setColorByHexCode(staticColor);
-	//	frame = createSolidColorFrame(320, 140, staticColor); // Create a solid color frame
-	//}
-	//else {
-	//	//frame = cv::imread("D:/resources/pictures/test.jpg"); // Replace with actual frame source
-	//	//if (frame.empty()) {
-	//	//	std::cerr << "Error: Could not read the image." << std::endl;
-	//	//	return -1;
-	//	//}
-	//}
-
-	//while (keepRunning) {
- //       
- //       videoFileSource.getNextFrame(frame);
-
- //       // Resize the frame to the desired resolution
- //       cv::resize(frame, resizedFrame, targetSize);
-
- //       lcc.setColorBySource(resizedFrame);
-	//	// Process the frame with your ImageProcessor logic
-	//	// ImageProcessor::processframe(colorArray, frame); // Uncomment and implement this line with your logic
-
-	//	// Simulate the LEDs around the frame
-	//	simulateLEDs(resizedFrame, pColorArray, ledNumWidth, ledNumHeight, showBottom);
-
-	//	// Read next frame (for demonstration, just repeat the same frame)
-	//	// frame = ...; // Replace with code to capture the next frame
-
- //       // Add a delay of 100 milliseconds (adjust as needed)
- //       //Sleep(1000 / 120); // 100 milliseconds
- //       //usleep(100000); // 100000 microseconds = 100 milliseconds
-
-	//}
- //   cv::destroyAllWindows();
-	return 0;
+    cv::Mat frame(height, width, CV_8UC3, cv::Scalar((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF));
+    return frame;
 }
