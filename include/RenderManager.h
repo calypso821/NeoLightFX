@@ -7,6 +7,7 @@
 #include <opencv2/core/mat.hpp>
 
 #include "sources/FrameSource.h"
+#include "controllers/SimulationController.h"
 #include "controllers/LEDColorController.h"
 
 enum class RenderMode
@@ -31,7 +32,6 @@ enum class Color {
 	Black = 0x000000
 };
 
-
 class RenderManager
 {
 public:
@@ -49,6 +49,8 @@ public:
 	void render();
 	void stop();
 	bool isRunning();
+
+	std::string toString() const;
 	
 	
 private:
@@ -60,9 +62,11 @@ private:
 	float m_fps;
 
 	LEDColorController* m_pLedControlController;
+	SimulationController* m_pSimController;
 	FrameSource* m_pFrameSource;
 	cv::Mat m_frame;
 
+	void init();
 	void setStaticColor(uint32_t color);
 	
 };

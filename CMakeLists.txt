@@ -21,12 +21,15 @@ file(GLOB_RECURSE SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
 set(SOURCES 
     src/controllers/LEDColorController.cpp
     src/controllers/InputSourceController.cpp
-    src/utils/SimulationUtils.cpp
+    src/controllers/SimulationController.cpp
     src/sources/VideoSource.cpp
+    src/sources/CaptureSource.cpp
     src/sources/ImageSource.cpp
     src/FrameProcessor.cpp
     src/RenderManager.cpp
-    src/Debug.cpp
+    src/utils/Debug.cpp
+    src/utils/EnumToString.cpp
+    src/utils/platform_detection.cpp
 )
 
 # Add the source files to the example application executable
@@ -35,7 +38,13 @@ add_executable(NeoLightFX_Simulator
     main/main.cpp
     ${SOURCES}
 )
-target_link_libraries(NeoLightFX_Simulator ${OpenCV_LIBS})
+target_link_libraries(NeoLightFX_Simulator PRIVATE ${OpenCV_LIBS})
+
+# Link against winmm.lib
+if (WIN32)
+    target_link_libraries(NeoLightFX_Simulator PRIVATE winmm)
+endif()
+
 #[[
 add_executable(runExampleApp 
     example/main.cpp 

@@ -62,6 +62,10 @@ bool LEDColorController::getBottomStatus()
 {
     return m_showBottom;
 }
+std::pair<int, int> LEDColorController::getLedResolution()
+{
+    return { m_ledNum_width, m_ledNum_height };
+}
 
 void LEDColorController::setStaticColor(uint32_t color)
 {

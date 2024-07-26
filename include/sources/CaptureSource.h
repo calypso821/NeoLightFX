@@ -1,5 +1,5 @@
-#ifndef IMAGESOURCE_H
-#define IMAGESOURCE_H
+#ifndef CAPTURESOURCE_H
+#define CAPTURESOURCE_H
 
 #include "sources/FrameSource.h"
 
@@ -7,17 +7,16 @@
 
 #include <opencv2/opencv.hpp>
 
-class ImageSource : public FrameSource {
+class CaptureSource : public FrameSource {
 public:
-    ImageSource(const std::string& filename);
+    CaptureSource(int device);
 
     bool getNextFrame(cv::Mat& frame) override;
     std::pair<int, int> getResolution() const override;
     float getFPS() const override;
 
 private:
-    cv::Mat image;
-    bool frameReturned;
+    cv::VideoCapture cap;
 };
 
-#endif // IMAGESOURCE_H
+#endif // CAPTURESOURCE_H

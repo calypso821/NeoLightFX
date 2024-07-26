@@ -21,6 +21,11 @@ std::pair<int, int> ImageSource::getResolution() const
     return { width, height };
 }
 
+float ImageSource::getFPS() const
+{
+    return 5.0f;
+}
+
 bool ImageSource::getNextFrame(cv::Mat& frame)
 {
     // Frame already returned
@@ -31,8 +36,4 @@ bool ImageSource::getNextFrame(cv::Mat& frame)
     frame = image.clone();
     frameReturned = true;
     return true;
-}
-float ImageSource::getFPS()
-{
-    return 5.0f;
 }

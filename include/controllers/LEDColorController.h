@@ -18,6 +18,7 @@ public:
     uint32_t* getColorArray();
     int getColorArraySize();
     bool getBottomStatus();
+    std::pair<int, int> getLedResolution();
 
     void setStaticColor(uint32_t color);
     void setColorBySource(cv::Mat frame);
