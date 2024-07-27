@@ -5,11 +5,15 @@ project(NeoLightFX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-# Set the path to the OpenCVConfig.cmake file
-set(OpenCV_DIR "D:/repos/libs/opencv/build/x64/vc16/lib")
+# Set the path to the OpenCV library
+if(WIN32)
+    set(OpenCV_DIR "D:/repos/libs/opencv/build/x64/vc16/lib")
+elseif(UNIX)
+    set(OpenCV_DIR "/usr/share/opencv4")
+endif()
+
 # Find OpenCV package
 find_package(OpenCV REQUIRED)
-
 
 # Add include directories
 include_directories(${PROJECT_SOURCE_DIR}/include)
@@ -39,7 +43,6 @@ add_executable(NeoLightFX_Simulator
     ${SOURCES}
 )
 target_link_libraries(NeoLightFX_Simulator PRIVATE ${OpenCV_LIBS})
-
 # Link against winmm.lib
 if (WIN32)
     target_link_libraries(NeoLightFX_Simulator PRIVATE winmm)

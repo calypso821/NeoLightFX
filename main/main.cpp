@@ -36,12 +36,13 @@ int main()
 	std::string videoPath = "D:/resources/videos/Ambilight.mp4";
 	std::string videoPath1 = "D:/resources/videos/OW_Widow.mp4";
 	std::string videoPath2 = "D:/resources/videos/test2.mp4";
+	std::string videoPath3 = "/home/matic/Videos/SampleVideo.mp4";
 	std::string imagePath = "D:/resources/images/test.jpg";
 
 	// Initialize source
-	//VideoSource videoSource{ videoPath2 };
+	VideoSource videoSource{ videoPath3 };
 	//CaptureSource capSource{ 0 };
-	CaptureSource capSource{ 0, 1280, 720, 30 };
+	//CaptureSource capSource{ 0, 1280, 720, 30 };
 	//ImageSource imgSource{ imagePath };
 
 
@@ -50,11 +51,11 @@ int main()
 	g_pRenderManager = &renderManager;
 
 	/* VIDEO SORUCE */
-	//renderManager.setFrameSource(&videoSource);
-	////renderManager.setResolution(640, 480);
-	////renderManager.setFPS(60);
-	//renderManager.setColorMode(ColorMode::DYNAMIC);
-	//std::cout << renderManager.toString() << std::endl;
+	renderManager.setFrameSource(&videoSource);
+	//renderManager.setResolution(640, 480);
+	renderManager.setFPS(10);
+	renderManager.setColorMode(ColorMode::DYNAMIC);
+	std::cout << renderManager.toString() << std::endl;
 
 	/* IMAGE SOURCE */
 	/*renderManager.setFrameSource(&imgSource);
@@ -64,10 +65,10 @@ int main()
 	//std::cout << renderManager.toString() << std::endl;
 
 	/* CAPTURE SORUCE */
-	renderManager.setFrameSource(&capSource);
-	//renderManager.setFPS(15);
-	renderManager.setColorMode(ColorMode::DYNAMIC);
-	std::cout << renderManager.toString() << std::endl;
+	// renderManager.setFrameSource(&capSource);
+	// //renderManager.setFPS(15);
+	// renderManager.setColorMode(ColorMode::DYNAMIC);
+	// std::cout << renderManager.toString() << std::endl;
 	
 	renderManager.render();
 	

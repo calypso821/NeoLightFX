@@ -184,10 +184,10 @@ void RenderManager::render()
 {
 	// Set sleep timer percision 
 	/* WINDOWS */
-	if (getPlatform() == Platform::Windows) {
+#ifdef _WIN32
 		std::cout << "Platform: Windows" << std::endl;
 		timeBeginPeriod(1);
-	}
+#endif
 
 	using namespace std::chrono;
 
@@ -292,11 +292,11 @@ void RenderManager::render()
 		cv::destroyAllWindows();
 	}
 	// Reset sleep timer percision 
-	/* WINDOWS */
+#ifdef _WIN32
 	if (getPlatform() == Platform::Windows) {
 		timeEndPeriod(1);
 	}
-
+#endif
 	std::cout << "Rendering stopped..." << std::endl;
 
 }

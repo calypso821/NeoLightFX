@@ -9,7 +9,6 @@ VideoSource::VideoSource(const std::string& filename)
         throw std::runtime_error("Filename cannot be empty");
     }
 
-    cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_ERROR);
     cap.open(filename);
     if (!cap.isOpened()) {
         throw std::runtime_error("Error opening video file");

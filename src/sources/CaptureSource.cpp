@@ -18,7 +18,6 @@ CaptureSource::CaptureSource(int device, int width, int height, int fps)
 }
 void CaptureSource::openDevice(int device)
 {
-    cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_ERROR);
     std::cout << "Opening capture device..." << std::endl;
 
     cap.open(device);

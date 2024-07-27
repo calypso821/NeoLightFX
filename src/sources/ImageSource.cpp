@@ -7,7 +7,6 @@
 ImageSource::ImageSource(const std::string& filename)
     : frameCloned(false)
 {
-    cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_ERROR);
     image = cv::imread(filename);
     if (image.empty()) {
         throw std::runtime_error("Error opening image file");
