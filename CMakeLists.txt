@@ -33,7 +33,7 @@ set(SOURCES
     src/RenderManager.cpp
     src/utils/Debug.cpp
     src/utils/EnumToString.cpp
-    src/utils/platform_detection.cpp
+    src/utils/percision_timer.cpp
 )
 
 # Add the source files to the example application executable

@@ -5,7 +5,7 @@
 
 #include "utils/Debug.h"
 #include "utils/EnumToString.h"
-#include "utils/platform_detection.h"
+#include "utils/percision_timer.h"
 
 RenderManager::RenderManager(LEDColorController* colorController)
 	: m_running(false),
@@ -183,11 +183,7 @@ bool RenderManager::isRunning()
 void RenderManager::render()
 {
 	// Set sleep timer percision 
-	/* WINDOWS */
-#ifdef _WIN32
-		std::cout << "Platform: Windows" << std::endl;
-		timeBeginPeriod(1);
-#endif
+	setPercisionTimer();
 
 	using namespace std::chrono;
 
@@ -292,12 +288,7 @@ void RenderManager::render()
 		cv::destroyAllWindows();
 	}
 	// Reset sleep timer percision 
-#ifdef _WIN32
-	if (getPlatform() == Platform::Windows) {
-		timeEndPeriod(1);
-	}
-#endif
+	resetPercisionTimer();
 	std::cout << "Rendering stopped..." << std::endl;
 
 }
-
