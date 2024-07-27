@@ -2,9 +2,10 @@
 #include <csignal>
 #include <unistd.h>
 
-#include "LEDStripController.h"
-#include "LEDStripControllerRpi3.h"
-#include "LEDColorController.h"
+#include "hardware/LEDStripController.h"
+#include "hardware/rpi3/LEDStripControllerRpi3.h"
+#include "controllers/LEDColorController.h"
+
 
 static const int LEDS_WIDTH = 45;
 static const int LEDS_HEIGHT = 18;
@@ -29,7 +30,7 @@ int main()
     LEDColorController lcc = LEDColorController(LEDS_WIDTH, LEDS_HEIGHT, SHOW_BOTTOM);
     uint32_t* pColorArray = lcc.getColorArray();
 
-    lcc.setColorByHexCode(0xFF0F00);
+    lcc.setStaticColor(0xFF0F00);
     //lcc.setColorByName(Color::Red);
     //lcc.setColorByName(Color::Green);
 

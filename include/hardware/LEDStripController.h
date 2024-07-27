@@ -1,6 +1,8 @@
 #ifndef LEDSTRIPCONTROLLER_H
 #define LEDSTRIPCONTROLLER_H
 
+#include <cstdint>
+
 class LEDStripController {
 public:
     // Constructor

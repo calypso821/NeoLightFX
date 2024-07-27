@@ -9,7 +9,19 @@
       "installRoot": "${projectDir}\\install\\${name}",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
-      "ctestCommandArgs": ""
+      "ctestCommandArgs": "",
+      "variables": [
+        {
+          "name": "SIMULATE",
+          "value": "ON",
+          "type": "STRING"
+        },
+        {
+          "name": "HARDWARE",
+          "value": "OFF",
+          "type": "STRING"
+        }
+      ]
     }
   ]
 }

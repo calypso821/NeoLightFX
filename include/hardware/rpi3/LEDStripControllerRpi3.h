@@ -1,9 +1,9 @@
 #ifndef LEDSTRIPCONTROLLERRPI3_H
 #define LEDSTRIPCONTROLLERRPI3_H
 
-#include "LEDStripController.h"
+#include "hardware/LEDStripController.h"
 
-#include "ws2811.h"
+#include "rpi_281x/ws2811.h"
 
 class LEDStripControllerRpi3 : public LEDStripController {
 public:

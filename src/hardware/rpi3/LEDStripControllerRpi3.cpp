@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cstring>
 
-#include "LEDStripControllerRpi3.h"
+#include "hardware/rpi3/LEDStripControllerRpi3.h"
 
 
 // WS2811 definitions
