@@ -39,6 +39,7 @@ public:
 
 	void setFPS(float fps);
 	void setResolution(int width, int height);
+	void scaleResolution(float scalar);
 	void setRenderMode(RenderMode renderMode);
 	void setColorMode(ColorMode colorMode);
 
@@ -68,6 +69,7 @@ private:
 
 	void init();
 	void setStaticColor(uint32_t color);
+	void checkTargetProperties();
 	
 };
 

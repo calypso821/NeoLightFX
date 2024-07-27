@@ -3,17 +3,28 @@
 
 CaptureSource::CaptureSource(int device)
 {
+    openDevice(device);
+    setProperties(1280, 720, 30);
+    std::cout << "Capture source initialization: Success" << std::endl;
+    std::cout << this->toString() << std::endl;
+}
+
+CaptureSource::CaptureSource(int device, int width, int height, int fps)
+{
+    openDevice(device);
+    setProperties(width, height, fps);
+    std::cout << "Capture source initialization: Success" << std::endl;
+    std::cout << this->toString() << std::endl;
+}
+void CaptureSource::openDevice(int device)
+{
     cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_ERROR);
-    std::cout << "Opening device..." << std::endl;
+    std::cout << "Opening capture device..." << std::endl;
+
     cap.open(device);
     if (!cap.isOpened()) {
         throw std::runtime_error("Error opening capture card");
     }
-    std::cout << "Device opened: Success" << std::endl;
-
-    cap.set(cv::CAP_PROP_FRAME_WIDTH, 1920);
-    cap.set(cv::CAP_PROP_FRAME_HEIGHT, 1080);
-    cap.set(cv::CAP_PROP_FPS, 60);
 }
 
 std::pair<int, int> CaptureSource::getResolution() const
@@ -31,4 +42,14 @@ float CaptureSource::getFPS() const
 bool CaptureSource::getNextFrame(cv::Mat& frame) {
     cap >> frame;
     return !frame.empty();
+}
+
+void CaptureSource::setProperties(int width, int height, int fps)
+{
+    if (!cap.isOpened()) {
+        throw std::runtime_error("Error setting capture device properties");
+    }
+    cap.set(cv::CAP_PROP_FRAME_WIDTH, width);
+    cap.set(cv::CAP_PROP_FRAME_HEIGHT, height);
+    cap.set(cv::CAP_PROP_FPS, fps);
 }

@@ -58,6 +58,46 @@ void RenderManager::setResolution(int width, int height)
 	}
 	m_resolution = std::make_pair(width, height);
 }
+void RenderManager::scaleResolution(float scalar)
+{
+	if (isRunning()) {
+		std::cerr << "Cannot set resolution while running" << std::endl;
+		return;
+	}
+	int new_width = m_resolution.first * scalar;
+	int new_height = m_resolution.second * scalar;
+	m_resolution = std::make_pair(new_width, new_height);
+}
+
+void RenderManager::checkTargetProperties()
+{
+	if (m_pFrameSource)
+	{
+		/* RESOLUTION CHECK */
+		std::pair<int,int> max_res = m_pFrameSource->getResolution();
+		if (max_res.first < m_resolution.first || max_res.second < m_resolution.second)
+		{
+			setResolution(max_res.first, max_res.second);
+
+			std::cout << "Warning: Target resolution exceeds source resolution "
+					  << "(adjusted to " << m_resolution.first << "x" << m_resolution.second << ")"
+				      << std::endl;
+		}
+		// Initialize FrameProcessor with width, height
+		m_pLedControlController->initFrameProcessor(m_resolution.first, m_resolution.second);
+
+		/* FPS CHECK */
+		float max_fps = m_pFrameSource->getFPS();
+		if (max_fps < m_fps)
+		{
+			setFPS(max_fps);
+
+			std::cout << "Warning: Target FPS exceeds source FPS "
+				<< "(adjusted to " << m_fps << ")" << std::endl;
+		}
+	}	
+}
+
 void RenderManager::setFrameSource(FrameSource* frameSource)
 {
 	if (isRunning()) {
@@ -101,12 +141,6 @@ void RenderManager::setRenderMode(RenderMode renderMode)
 /* Functions can be set during runtime */
 void RenderManager::setColorMode(ColorMode colorMode)
 {
-	// Can be set during runtime
-	if (colorMode == ColorMode::DYNAMIC)
-	{
-		// Initialize frame processor
-		m_pLedControlController->initFrameProcessor(m_resolution.first, m_resolution.second);
-	}
 	m_colorMode = colorMode;
 }
 
@@ -124,6 +158,7 @@ void RenderManager::setStaticColor(uint32_t color)
 		}
 	}
 }
+
 
 void RenderManager::setColorByName(Color color)
 {
@@ -150,7 +185,7 @@ void RenderManager::render()
 	// Set sleep timer percision 
 	/* WINDOWS */
 	if (getPlatform() == Platform::Windows) {
-		std::cout << "Windows" << std::endl;
+		std::cout << "Platform: Windows" << std::endl;
 		timeBeginPeriod(1);
 	}
 
@@ -181,6 +216,9 @@ void RenderManager::render()
 	uint32_t* pColorArray = m_pLedControlController->getColorArray();
 	bool showBottom = m_pLedControlController->getBottomStatus();
 
+	// Check and adjust target properties (+ init FrameProcessor)
+	checkTargetProperties();
+
 	int targetWidth = m_resolution.first;
 	int targetHeight = m_resolution.second;
 
@@ -188,6 +226,7 @@ void RenderManager::render()
 	cv::Mat resizedFrame;
 
 	m_running.store(true);
+	bool hasNextFrame;
 
 	
 	std::cout << "Rendering started..."<< std::endl;
@@ -209,11 +248,13 @@ void RenderManager::render()
 				if (m_pFrameSource)
 				{
 					// Get next frame from frame source
-					m_pFrameSource->getNextFrame(m_frame);
+					hasNextFrame = m_pFrameSource->getNextFrame(m_frame);
+					if (!hasNextFrame) {
+						break;
+					}
 					m_pLedControlController->setColorBySource(m_frame);
 				}
 			}
-
 			// Resize the frame to target resolution
 			cv::resize(m_frame, resizedFrame, targetSize);
 			/* Simulate LED strip */

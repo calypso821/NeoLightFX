@@ -17,7 +17,7 @@ public:
 
 private:
     cv::Mat image;
-    bool frameReturned;
+    bool frameCloned;
 };
 
 #endif // IMAGESOURCE_H
