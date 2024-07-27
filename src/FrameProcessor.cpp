@@ -1,96 +1,192 @@
 #include "FrameProcessor.h"
 
-FrameProcessor::FrameProcessor(int width, int height) {
-    this->width = width;
-    this->height = height;
-    this->patch_width = width / LED_WIDTH;
-    this->patch_height = height / LED_HEIGHT;
-    this->patch_width_length = height * h_patch_size;
-    this->patch_height_length = width * w_patch_size;
-    this->padding = 0;
-    this->black_bars_height = height * black_bars_size;
-    this->averaging = 4;
+//TODO: Input paramter
+#define LED_WIDTH   50
+#define LED_HEIGHT  20
+#define DETECT_BLACK_BARS  true
+
+// Define the static constants
+const float FrameProcessor::HEIGHT_PATCH_RATIO = 0.2f; // 30% of height
+const float FrameProcessor::WIDTH_PATCH_RATIO = 0.2f;  // 30% of width
+const float FrameProcessor::BLACK_BAR_RATIO = 0.125f;   // 10% of height
+
+FrameProcessor::FrameProcessor(int ledNum_width, int ledNum_height, bool botttom)
+{
+    m_ledNum_width = ledNum_width;
+    m_ledNum_height = ledNum_height;
+
+    m_bottom = botttom;
 }
 
-void FrameProcessor::call(cv::Mat frame, ws2811_led_t* led_array) {
-    processBlackBars(frame);
-    processHorizontal(led_array, frame);
-    processVertical(led_array, frame);
+void FrameProcessor::init(int width, int height)
+{
+    m_width = width;
+    m_height = height;
+
+    // On Left, Right
+    m_verticalPatch_width = static_cast<int>(width * WIDTH_PATCH_RATIO);
+    m_verticalPatch_height = static_cast<int>(height / m_ledNum_height);
+
+    // On Top, Bottom
+    m_horizontalPatch_width = static_cast<int>(width / m_ledNum_width);
+    m_horizontalPatch_height = static_cast<int>(height * HEIGHT_PATCH_RATIO);
+
+    m_blackBar_height = static_cast<int>(height * BLACK_BAR_RATIO);
+    m_blackBarOffset = 0;
+    m_transitionSpeed = 1;
 }
 
-int FrameProcessor::getColor(cv::Scalar avg) {
-    int red = static_cast<int>(avg[2]);
-    int green = static_cast<int>(avg[1]);
-    int blue = static_cast<int>(avg[0]);
-    return (red << 16) + (green << 8) + blue;
+int FrameProcessor::getMeanBlack(cv::Mat blackBar)
+{
+    cv::Scalar meanBackBar = cv::mean(blackBar);
+    return static_cast<int>((meanBackBar[0] + meanBackBar[1] + meanBackBar[2]) / 3);
 }
 
-bool FrameProcessor::getMeanBlack(cv::Scalar black_top, cv::Scalar black_bot) {
-    int mean_top = (black_top[0] + black_top[1] + black_top[2]) / 3;
-    int mean_bot = (black_bot[0] + black_bot[1] + black_bot[2]) / 3;
-    return (mean_top < 6 && mean_bot < 6);
-}
+bool FrameProcessor::detectBlackBars(cv::Mat blackBar_top, cv::Mat blackBar_bot)
+{
+    int blackBarMean_top = FrameProcessor::getMeanBlack(blackBar_top);
+    int blackBarMean_bot = FrameProcessor::getMeanBlack(blackBar_bot);
 
-int FrameProcessor::getMean(int old_color, cv::Scalar avg, int num) {
-    int red_n = static_cast<int>(avg[2]);
-    int green_n = static_cast<int>(avg[1]);
-    int blue_n = static_cast<int>(avg[0]);
-
-    if (num != 0) {
-        int red_o = old_color >> 16 & 0xFF;
-        int green_o = old_color >> 8 & 0xFF;
-        int blue_o = old_color & 0xFF;
-
-        for (int i = 0; i < num; i++) {
-            red_n = (red_o + red_n) / 2;
-            green_n = (green_o + green_n) / 2;
-            blue_n = (blue_o + blue_n) / 2;
-        }
-    }
-    return (red_n << 16) + (green_n << 8) + blue_n;
+    return (blackBarMean_top < 6 && blackBarMean_bot < 6);
 }
 
 void FrameProcessor::processBlackBars(cv::Mat frame) {
-    cv::Mat black_bar_top = frame(cv::Rect(0, 0, width, black_bars_height));
-    cv::Mat black_bar_bot = frame(cv::Rect(0, height - black_bars_height, width, black_bars_height));
+    // Top side patch 
+    cv::Mat blackBar_top = frame(cv::Rect(
+        0, 
+        0,
+        m_width,
+        m_blackBar_height
+    ));
+    // Bottom side patch
+    cv::Mat blackBar_bot = frame(cv::Rect(
+        0,
+        m_height - m_blackBar_height,
+        m_width,
+        m_blackBar_height
+    ));
 
-    if (getMeanBlack(cv::mean(black_bar_top), cv::mean(black_bar_bot))) {
-        padding = black_bars_height;
-        patch_width_length = (height - 2 * black_bars_height) * h_patch_size;
-    } else {
-        padding = 0;
-        patch_width_length = height * h_patch_size;
+    if (detectBlackBars(blackBar_top, blackBar_bot))
+    {
+        m_blackBarOffset = m_blackBar_height;
+        int new_height = m_height - 2 * m_blackBar_height;
+        m_horizontalPatch_height = static_cast<int>(new_height * HEIGHT_PATCH_RATIO);
+    }
+    else 
+    {
+        m_blackBarOffset = 0;
+        m_horizontalPatch_height = static_cast<int>(m_height * HEIGHT_PATCH_RATIO);
     }
 }
 
-void FrameProcessor::processHorizontal(ws2811_led_t* array, cv::Mat frame) {
-    for (int i = 0; i < LED_WIDTH; i++) {
-        cv::Mat area_top = frame(cv::Rect(i * patch_width, 0 + padding, patch_width, patch_width_length));
-        cv::Scalar avg_top = cv::mean(area_top);
-        int pos_t = LED_HEIGHT;
-        array[pos_t + i] = getMean(array[pos_t + i], avg_top, averaging);
+// TODO: Transition
+//int FrameProcessor::getMean(int old_color, cv::Scalar avg, int num) {
+//    int red_n = static_cast<int>(avg[2]);
+//    int green_n = static_cast<int>(avg[1]);
+//    int blue_n = static_cast<int>(avg[0]);
+//
+//    if (num != 0) {
+//        int red_o = old_color >> 16 & 0xFF;
+//        int green_o = old_color >> 8 & 0xFF;
+//        int blue_o = old_color & 0xFF;
+//
+//        for (int i = 0; i < num; i++) {
+//            red_n = (red_o + red_n) / 2;
+//            green_n = (green_o + green_n) / 2;
+//            blue_n = (blue_o + blue_n) / 2;
+//        }
+//    }
+//    return (red_n << 16) + (green_n << 8) + blue_n;
+//}
 
-        if (BOTTOM) {
-            int indexW = LED_WIDTH - 1 - i;
-            cv::Mat area_bot = frame(cv::Rect(indexW * patch_width, height - patch_width_length - padding, patch_width, patch_width_length));
-            cv::Scalar avg_bot = cv::mean(area_bot);
-            int pos_b = LED_HEIGHT * 2 + LED_WIDTH;
-            array[pos_b + i] = getMean(array[pos_b + i], avg_bot, averaging);
+uint32_t FrameProcessor::toUint32Color(cv::Scalar color)
+{
+    uint8_t red = static_cast<uint8_t>(color[0]);
+    uint8_t green = static_cast<uint8_t>(color[1]);
+    uint8_t blue = static_cast<uint8_t>(color[2]);
+
+    // TODO: How this works? 
+    return (red << 16) | (green << 8) | blue;
+}
+
+void FrameProcessor::processHorizontal(uint32_t* array, cv::Mat frame)
+{
+    int patch_width = m_horizontalPatch_width;
+    int patch_height = m_horizontalPatch_height;
+
+    for (int i = 0; i < m_ledNum_width; i++)
+    {
+        // Top side (Left -> Right)
+        cv::Mat patch_top = frame(cv::Rect(
+            i * patch_width,
+            0 + m_blackBarOffset,
+            patch_width,
+            patch_height
+        ));
+        cv::Scalar meanColor_top = cv::mean(patch_top);
+        int pos_t = m_ledNum_height;
+        //array[pos_t + i] = getMean(array[pos_t + i], avg_top, averaging);
+        array[pos_t + i] = toUint32Color(meanColor_top);
+
+        if (m_bottom)
+        {
+            // Bottom side (Left <- Right)
+            int i_inverse = m_ledNum_width - 1 - i;
+            cv::Mat patch_bot = frame(cv::Rect(
+                i_inverse * patch_width,
+                m_height - patch_height - m_blackBarOffset,
+                patch_width,
+                patch_height
+            ));
+            cv::Scalar meanColor_bot = cv::mean(patch_bot);
+            int pos_b = m_ledNum_height * 2 + m_ledNum_width;
+            //array[pos_b + i] = getMean(array[pos_b + i], avg_bot, averaging);
+            array[pos_b + i] = toUint32Color(meanColor_bot);
         }
     }
 }
 
-void FrameProcessor::processVertical(ws2811_led_t* array, cv::Mat frame) {
-    for (int i = 0; i < LED_HEIGHT; i++) {
-        int indexH = LED_HEIGHT - 1 - i;
-        cv::Mat area_left = frame(cv::Rect(0, indexH * patch_height, patch_height_length, patch_height));
-        cv::Scalar avg_left = cv::mean(area_left);
-        int pos_l = 0;
-        array[pos_l + i] = getMean(array[pos_l + i], avg_left, averaging);
+void FrameProcessor::processVertical(uint32_t* array, cv::Mat frame)
+{
+    int patch_width = m_verticalPatch_width;
+    int patch_height = m_verticalPatch_height;
 
-        cv::Mat area_right = frame(cv::Rect(width - patch_height_length, i * patch_height, patch_height_length, patch_height));
-        cv::Scalar avg_right = cv::mean(area_right);
-        int pos_r = LED_HEIGHT + LED_WIDTH;
-        array[pos_r + i] = getMean(array[pos_r + i], avg_right, averaging);
+    for (int i = 0; i < m_ledNum_height; i++)
+    {
+        // Left side (Bottom -> Top)
+        int i_inverse = m_ledNum_height - 1 - i;
+        cv::Mat patch_left = frame(cv::Rect(
+            0,
+            i_inverse * patch_height,
+            patch_width,
+            patch_height
+        ));
+        cv::Scalar meanColor_left = cv::mean(patch_left);
+        int pos_l = 0;
+        // TODO: Transition smooth
+        //array[pos_l + i] = getMean(array[pos_l + i], avg_left, averaging);
+        array[pos_l + i] = toUint32Color(meanColor_left);
+
+        // Right side (Top -> Bottom)
+        cv::Mat patch_right = frame(cv::Rect(
+            m_width - patch_width,
+            i * patch_height,
+            patch_width,
+            patch_height
+        ));
+        cv::Scalar meanColor_right = cv::mean(patch_right);
+        int pos_r = m_ledNum_height + m_ledNum_width;
+        //array[pos_r + i] = getMean(array[pos_r + i], avg_right, averaging);
+        array[pos_r + i] = toUint32Color(meanColor_right);
     }
+}
+
+void FrameProcessor::processFrame(uint32_t* colorArray, cv::Mat frame)
+{
+    if (DETECT_BLACK_BARS) {
+        processBlackBars(frame);
+    }
+
+    processHorizontal(colorArray, frame);
+    processVertical(colorArray, frame);
 }

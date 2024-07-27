@@ -1,21 +1,11 @@
 #ifndef LEDCOLORCONTROLLER_H
 #define LEDCOLORCONTROLLER_H
 
-// #include "FrameProcessor.h"
-// #include "StaticColor.h"
-// #include <ws2811.h>
-// #include <opencv2/opencv.hpp>
 #include <cstdint>
 
-enum class Color {
-    Red = 0xFF0000,
-    Green = 0x00FF00,
-    Blue = 0x0000FF,
-    White = 0xFFFFFF,
-    Black = 0x000000
-};
+#include <opencv2/core/mat.hpp>
 
-
+#include "FrameProcessor.h"
 
 class LEDColorController 
 {
@@ -23,11 +13,18 @@ public:
     LEDColorController(int ledNum_width, int ledNum_height, bool showBotttom);
     ~LEDColorController();
 
+    void initFrameProcessor(int width, int height);
+
     uint32_t* getColorArray();
     int getColorArraySize();
+    bool getBottomStatus();
+    std::pair<int, int> getLedResolution();
 
-    void setColorByName(Color color);
-    void setColorByHexCode(uint32_t color);
+    void setStaticColor(uint32_t color);
+    void setColorBySource(cv::Mat frame);
+
+    //void setColorByName(Color color);
+    //void setColorByHexCode(uint32_t color);
 
 private:
     int m_ledNum_width;
@@ -36,15 +33,14 @@ private:
     int m_brightness;
     bool m_showBottom;
 
-    
+
+    FrameProcessor m_frameProcessor;
 
     int m_colorArraySize;
     uint32_t* m_pColorArray;
 
     void initColorArray();
     void clearColorArray();
-
-    void setStaticColor(uint32_t color);
 };
 
 #endif // LEDCOLORCONTROLLER_H

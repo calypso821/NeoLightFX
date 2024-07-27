@@ -2,30 +2,45 @@
 #define FRAMEPROCESSOR_H
 
 #include <opencv2/opencv.hpp>
-#include <ws2811.h>
+#include <cstdint>
 
 class FrameProcessor {
 public:
-    FrameProcessor(int width, int height);
-    void call(cv::Mat frame, ws2811_led_t* led_array);
+    FrameProcessor(int ledNum_width, int ledNum_height, bool botttom);
+    void init(int width, int height);
+    void processFrame(uint32_t* colorArray, cv::Mat frame);
 
 private:
-    int width;
-    int height;
-    int patch_width;
-    int patch_height;
-    int patch_width_length;
-    int patch_height_length;
-    int padding;
-    int black_bars_height;
-    int averaging;
+    static const float HEIGHT_PATCH_RATIO;  // % of height
+    static const float WIDTH_PATCH_RATIO;   // % of width
+    static const float BLACK_BAR_RATIO;     // % of height
 
-    int getColor(cv::Scalar avg);
-    bool getMeanBlack(cv::Scalar black_top, cv::Scalar black_bot);
-    int getMean(int old_color, cv::Scalar avg, int num);
+    int m_ledNum_width;
+    int m_ledNum_height;
+    int m_bottom;
+
+    int m_width;
+    int m_height;
+
+    int m_verticalPatch_width;
+    int m_verticalPatch_height;
+
+    int m_horizontalPatch_width;
+    int m_horizontalPatch_height;
+
+    int m_blackBar_height;
+    int m_blackBarOffset;
+    int m_transitionSpeed;
+
+    int getMeanBlack(cv::Mat blackBar);
+    bool detectBlackBars(cv::Mat blackBar_top, cv::Mat blackBar_bot);
     void processBlackBars(cv::Mat frame);
-    void processHorizontal(ws2811_led_t* array, cv::Mat frame);
-    void processVertical(ws2811_led_t* array, cv::Mat frame);
+
+    //int getMean(int oldColor, cv::Scalar avg, int num);
+    uint32_t toUint32Color(cv::Scalar color);
+    void processHorizontal(uint32_t* colorArray, cv::Mat frame);
+    void processVertical(uint32_t* colorArray, cv::Mat frame);
+
 };
 
 #endif // FRAMEPROCESSOR_H
