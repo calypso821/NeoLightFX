@@ -56,6 +56,10 @@ int main()
 		// Assign address of renderManager object to global pointer
 		g_pRenderManager = &renderManager;
 
+		/* STATIC COLOR */
+		renderManager.setColorMode(ColorMode::STATIC);
+		renderManager.setColorByName(Color::Green);
+
 		/* VIDEO SORUCE */
 		renderManager.setFrameSource(&videoSource);
 		//renderManager.setResolution(640, 480);

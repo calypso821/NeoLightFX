@@ -24,7 +24,7 @@ std::pair<int, int> ImageSource::getResolution() const
 
 float ImageSource::getFPS() const
 {
-    return 5.0f;
+    return 10.0f;
 }
 
 bool ImageSource::getNextFrame(cv::Mat& frame)

@@ -3,12 +3,14 @@
 
 #include <utility>
 #include <atomic>
+#include <chrono>
 
 #include <opencv2/core/mat.hpp>
 
 #include "sources/FrameSource.h"
-#include "controllers/SimulationController.h"
+#include "controllers/VisualController.h"
 #include "controllers/LEDColorController.h"
+#include "controllers/SimulationController.h"
 
 enum class RenderMode
 {
@@ -61,8 +63,10 @@ private:
 
 	std::pair<int, int> m_resolution;
 	float m_fps;
+	std::chrono::duration<float, std::milli> m_frameDuration;
 
 	LEDColorController* m_pLedControlController;
+	VisualController* m_pVisualController;
 	SimulationController* m_pSimController;
 	FrameSource* m_pFrameSource;
 	cv::Mat m_frame;
