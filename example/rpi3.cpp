@@ -30,7 +30,7 @@ int main()
     LEDColorController lcc = LEDColorController(LEDS_WIDTH, LEDS_HEIGHT, SHOW_BOTTOM);
     uint32_t* pColorArray = lcc.getColorArray();
 
-    lcc.setStaticColor(0xFF0F00);
+    lcc.setStaticColor(0xFF0000);
     //lcc.setColorByName(Color::Red);
     //lcc.setColorByName(Color::Green);
 

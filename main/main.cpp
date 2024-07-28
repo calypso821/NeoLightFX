@@ -1,6 +1,6 @@
 #include <csignal>
 
-//#include <opencv2/core/utils/logger.hpp>
+#include <opencv2/core/utils/logger.hpp>
 
 #include "controllers/LEDColorController.h"
 #include "sources/VideoSource.h"
@@ -29,7 +29,7 @@ int main()
 		Debug::set(true);
 
 		// Set OpenCV logging level to show only errors
-		//cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_ERROR);
+		cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_ERROR);
 
 		int numLedWidth = 34;
 		int numLedHeight = 21;
