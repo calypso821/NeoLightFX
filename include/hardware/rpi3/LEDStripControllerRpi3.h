@@ -13,7 +13,7 @@ public:
 	// Destructor
 	~LEDStripControllerRpi3() override;
 
-	void init() override;
+	void initialize() override;
 	void render() override;
 
 	void ledArraySetColor(uint32_t* colorArray) override;

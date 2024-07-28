@@ -35,7 +35,7 @@ int main()
     //lcc.setColorByName(Color::Green);
 
 
-    controller->init();
+    controller->initialize();
     controller->ledArrayClear();
     
     // Register signal handler for Ctrl + C

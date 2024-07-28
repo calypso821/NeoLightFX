@@ -1,14 +1,3 @@
-// RenderManager implementation 
-// RenderMode HARDWARE 
-// Exectue
-
-//LEDStripController* controller;
-//controller = new LEDStripControllerRpi3(LED_COUNT);
-//// Set color
-//controller->ledArraySetColor(pColorArray);
-//// Render
-//controller->render();
-
 #include <csignal>
 
 #include <opencv2/core/utils/logger.hpp>
@@ -40,7 +29,7 @@ int main()
 		Debug::set(true);
 
 		// Set OpenCV logging level to show only errors
-		cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_ERROR);
+		//cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_ERROR);
 
 		int numLedWidth = 34;
 		int numLedHeight = 21;
@@ -49,23 +38,49 @@ int main()
 		// Initialize Color controller
 		LEDColorController ledColorController{ numLedWidth, numLedHeight, showBottom };
 
-		CaptureSource capSource{ 0 };
+		// File paths
+		std::string videoPath = "D:/resources/videos/Ambilight.mp4";
+		std::string videoPath1 = "D:/resources/videos/OW_Widow.mp4";
+		std::string videoPath2 = "D:/resources/videos/test2.mp4";
+		std::string videoPath3 = "/home/matic/Videos/SampleVideo.mp4";
+		std::string imagePath = "D:/resources/images/test.jpg";
+
+		// Initialize source
+		//VideoSource videoSource{ videoPath };
+		//CaptureSource capSource{ 0 };
 		//CaptureSource capSource{ 0, 1280, 720, 30 };
+		//ImageSource imgSource{ imagePath };
 
 
 		RenderManager renderManager{ &ledColorController };
 		// Assign address of renderManager object to global pointer
 		g_pRenderManager = &renderManager;
 
-		/* STATIC */
-		renderManager.setColorMode(ColorMode::STATIC);
-		renderManager.setColorByName(Color::Blue);
+		renderManager.setRenderMode(RenderMode::HARDWARE);
 
-		/* CAPTURE SORUCE */
-		//renderManager.setFrameSource(&capSource);
-		////renderManager.setFPS(15);
+		/* STATIC COLOR */
+		renderManager.setColorMode(ColorMode::STATIC);
+		renderManager.setColorByName(Color::Green);
+
+		/* VIDEO SORUCE */
+		//renderManager.setFrameSource(&videoSource);
+		////renderManager.setResolution(640, 480);
+		////renderManager.setFPS(10);
 		//renderManager.setColorMode(ColorMode::DYNAMIC);
 		//std::cout << renderManager.toString() << std::endl;
+
+		/* IMAGE SOURCE */
+		/*renderManager.setFrameSource(&imgSource);
+		renderManager.scaleResolution(1.5f);
+		renderManager.setFPS(15);
+		renderManager.setColorMode(ColorMode::DYNAMIC);*/
+		//std::cout << renderManager.toString() << std::endl;
+
+		/* CAPTURE SORUCE */
+		// renderManager.setFrameSource(&capSource);
+		// //renderManager.setFPS(15);
+		// renderManager.setColorMode(ColorMode::DYNAMIC);
+		// std::cout << renderManager.toString() << std::endl;
 
 		renderManager.render();
 
