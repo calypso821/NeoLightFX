@@ -5,9 +5,19 @@ project(NeoLightFX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# Add options for simulation and hardware
+option(SIMULATE "Build the simulation executable" OFF)
+option(HARDWARE "Build the hardware executable" OFF)
+
+# Use case 
+# cmake -DSIMULATE=ON -DHARDWARE=ON ..
+# cmake -DSIMULATE=ON ..
+
 # Set the path to the OpenCV library
 if(WIN32)
     set(OpenCV_DIR "D:/repos/libs/opencv/build/x64/vc16/lib")
+    # Add opencv.dll files to PATH!!
+    # D:\repos\libs\opencv\build\x64\vc16\bin
 elseif(UNIX)
     set(OpenCV_DIR "/usr/share/opencv4")
 endif()
@@ -17,59 +27,65 @@ find_package(OpenCV REQUIRED)
 
 # Add include directories
 include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_SOURCE_DIR}/third_party)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 # Gather all source files in the src directory
 file(GLOB_RECURSE SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
 
 set(SOURCES 
-    src/controllers/LEDColorController.cpp
-    src/controllers/InputSourceController.cpp
-    src/controllers/SimulationController.cpp
-    src/sources/VideoSource.cpp
-    src/sources/CaptureSource.cpp
-    src/sources/ImageSource.cpp
-    src/FrameProcessor.cpp
-    src/RenderManager.cpp
-    src/utils/Debug.cpp
-    src/utils/EnumToString.cpp
-    src/utils/percision_timer.cpp
+    ${PROJECT_SOURCE_DIR}/src/controllers/LEDColorController.cpp
+    ${PROJECT_SOURCE_DIR}/src/controllers/SimulationController.cpp
+    ${PROJECT_SOURCE_DIR}/src/sources/VideoSource.cpp
+    ${PROJECT_SOURCE_DIR}/src/sources/CaptureSource.cpp
+    ${PROJECT_SOURCE_DIR}/src/sources/ImageSource.cpp
+    ${PROJECT_SOURCE_DIR}/src/FrameProcessor.cpp
+    ${PROJECT_SOURCE_DIR}/src/RenderManager.cpp
+    ${PROJECT_SOURCE_DIR}/src/utils/Debug.cpp
+    ${PROJECT_SOURCE_DIR}/src/utils/EnumToString.cpp
+    ${PROJECT_SOURCE_DIR}/src/utils/percision_timer.cpp
 )
 
-# Add the source files to the example application executable
-
-add_executable(NeoLightFX_Simulator
-    main/main.cpp
-    ${SOURCES}
-)
-target_link_libraries(NeoLightFX_Simulator PRIVATE ${OpenCV_LIBS})
-# Link against winmm.lib
-if (WIN32)
-    target_link_libraries(NeoLightFX_Simulator PRIVATE winmm)
+# SIMULATION executables
+if(SIMULATE)
+    add_executable(NeoLightFX_Simulator
+        ${PROJECT_SOURCE_DIR}/main/main.cpp
+        ${SOURCES}
+    )
+    target_link_libraries(NeoLightFX_Simulator PRIVATE ${OpenCV_LIBS})
+    # Link against winmm.lib
+    if(WIN32)
+        target_link_libraries(NeoLightFX_Simulator PRIVATE winmm)
+    endif()
 endif()
 
-#[[
-add_executable(runExampleApp 
-    example/main.cpp 
-    ${SOURCES}
-)
+# HARDWARE executables
+if(HARDWARE AND UNIX)
+    # Add the rpi_ws281x source files
+    set(RPI_WS281X_SOURCES
+        ${PROJECT_SOURCE_DIR}/third_party/rpi_281x/ws2811.c
+        ${PROJECT_SOURCE_DIR}/third_party/rpi_281x/rpihw.c
+        ${PROJECT_SOURCE_DIR}/third_party/rpi_281x/pwm.c
+        ${PROJECT_SOURCE_DIR}/third_party/rpi_281x/dma.c
+        ${PROJECT_SOURCE_DIR}/third_party/rpi_281x/pcm.c
+        ${PROJECT_SOURCE_DIR}/third_party/rpi_281x/mailbox.c
+    )
 
-add_executable(simulationApp 
-    simulation/led_simulation.cpp
-    ${SOURCES}
-)
+    # Create a static library from the submodule source files
+    add_library(rpi_ws281x STATIC ${RPI_WS281X_SOURCES})
 
-add_executable(runInputSource 
-    example/inputSource.cpp
-    ${SOURCES}
-)
+    set(HARDWARE_SOURCES
+        ${PROJECT_SOURCE_DIR}/src/hardware/rpi3/LEDStripControllerRpi3.cpp
+    )
 
-# Link OpenCV libraries using absolute path
-# target_link_libraries(runInputSource ${OpenCV_LIBS})
-# target_link_libraries(runExampleApp ${OpenCV_LIBS})
-# target_link_libraries(simulationapp ${opencv_libs})
-]]
+    # Exmaple executables
+    add_executable(example_RPI3
+        ${PROJECT_SOURCE_DIR}/example/rpi3.cpp
+        ${SOURCES}
+        ${HARDWARE_SOURCES}
+    )
 
-# Add opencv.dll files to PATH!!
-# D:\repos\libs\opencv\build\x64\vc16\bin
-
+    # Link the static library with the example application executables
+    target_link_libraries(example_RPI3 PRIVATE rpi_ws281x)
+    target_link_libraries(example_RPI3 PRIVATE ${OpenCV_LIBS})
+endif()
