@@ -58,6 +58,10 @@ int LEDColorController::getColorArraySize()
 {
     return m_colorArraySize;
 }
+int LEDColorController::getLedCount()
+{
+    return getColorArraySize();
+}
 bool LEDColorController::getBottomStatus()
 {
     return m_showBottom;

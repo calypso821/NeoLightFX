@@ -17,6 +17,7 @@ public:
 
     uint32_t* getColorArray();
     int getColorArraySize();
+    int getLedCount();
     bool getBottomStatus();
     std::pair<int, int> getLedResolution();
 
