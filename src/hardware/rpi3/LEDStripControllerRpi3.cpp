@@ -20,7 +20,7 @@ LEDStripControllerRpi3::~LEDStripControllerRpi3()
     std::cout << "LED strip ws2811 resource release: Success" << std::endl;
 }
 
-void LEDStripControllerRpi3::init() {
+void LEDStripControllerRpi3::initialize() {
     m_ledArray =
     {
         .freq = TARGET_FREQ,

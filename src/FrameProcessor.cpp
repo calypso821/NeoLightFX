@@ -101,9 +101,9 @@ void FrameProcessor::processBlackBars(cv::Mat frame) {
 
 uint32_t FrameProcessor::toUint32Color(cv::Scalar color)
 {
-    uint8_t red = static_cast<uint8_t>(color[0]);
+    uint8_t red = static_cast<uint8_t>(color[2]);
     uint8_t green = static_cast<uint8_t>(color[1]);
-    uint8_t blue = static_cast<uint8_t>(color[2]);
+    uint8_t blue = static_cast<uint8_t>(color[0]);
 
     // TODO: How this works? 
     return (red << 16) | (green << 8) | blue;

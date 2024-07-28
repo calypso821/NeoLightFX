@@ -15,7 +15,7 @@ public:
     HardwareController(LEDColorController* colorController);
     ~HardwareController() override;
 
-    void initialize(int ledCount) override;
+    void initialize() override;
     void shutdown() override;
     void renderFrame() override;
     void clearFrame() override;

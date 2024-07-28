@@ -1,6 +1,7 @@
 #include <csignal>
 
 #include <opencv2/core/utils/logger.hpp>
+#include <opencv2/opencv.hpp>
 
 #include "controllers/LEDColorController.h"
 #include "sources/VideoSource.h"
@@ -32,8 +33,8 @@ int main()
 		//cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_ERROR);
 
 		int numLedWidth = 34;
-		int numLedHeight = 21;
-		bool showBottom = true;
+		int numLedHeight = 20;
+		bool showBottom = false;
 
 		// Initialize Color controller
 		LEDColorController ledColorController{ numLedWidth, numLedHeight, showBottom };
@@ -47,7 +48,7 @@ int main()
 
 		// Initialize source
 		//VideoSource videoSource{ videoPath };
-		//CaptureSource capSource{ 0 };
+		CaptureSource capSource{ 0 };
 		//CaptureSource capSource{ 0, 1280, 720, 30 };
 		//ImageSource imgSource{ imagePath };
 
@@ -77,15 +78,12 @@ int main()
 		//std::cout << renderManager.toString() << std::endl;
 
 		/* CAPTURE SORUCE */
-		// renderManager.setFrameSource(&capSource);
-		// //renderManager.setFPS(15);
-		// renderManager.setColorMode(ColorMode::DYNAMIC);
-		// std::cout << renderManager.toString() << std::endl;
+		 renderManager.setFrameSource(&capSource);
+		 //renderManager.setFPS(15);
+		 renderManager.setColorMode(ColorMode::DYNAMIC);
+		 std::cout << renderManager.toString() << std::endl;
 
 		renderManager.render();
-
-		std::cout << "Exiting program..." << std::endl;
-
 	}
 	catch (const std::runtime_error& e)
 	{

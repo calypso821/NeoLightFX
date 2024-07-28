@@ -13,23 +13,15 @@ RenderManager::RenderManager(LEDColorController* colorController)
 	m_pVisualController(nullptr),
 	m_pSimController(nullptr)
 {
-	init();
-}
-
-void RenderManager::init()
-{
 	setRenderMode(RenderMode::SIMULATE);
 	setColorMode(ColorMode::STATIC);
 	setResolution(1280, 720);
 	// Set FPS + frame duration
 	setFPS(10.0f);
 	setStaticColor(0xFF);
-	
-
 
 	std::cout << "Render manager initialization: Success" << std::endl;
 	//std::cout << toString() << std::endl;
-
 }
 
 std::string RenderManager::toString() const
@@ -123,6 +115,10 @@ void RenderManager::setRenderMode(RenderMode renderMode)
 	{
 		m_pVisualController = new SimulationController{ m_pLedControlController };
 	}
+	if (renderMode == RenderMode::HARDWARE)
+	{
+		m_pVisualController = new HardwareController{ m_pLedControlController };
+	}
 
 	m_renderMode = renderMode;
 }
@@ -133,7 +129,6 @@ void RenderManager::setFPS(float fps)
 	// The count() method returns the number of milliseconds as a float,
 	// Calculate the frame duration in milliseconds with floating-point precision
 	m_frameDuration = std::chrono::duration<float, std::milli>(1000.0f / fps);
-	std::cout << "Frame duration: " << m_frameDuration.count() << " ms" << std::endl;
 	m_fps = fps;
 	
 }
@@ -142,6 +137,12 @@ void RenderManager::setColorMode(ColorMode colorMode)
 	if (colorMode == ColorMode::STATIC)
 	{
 		setFPS(10.0f);
+	}
+	if (colorMode == ColorMode::DYNAMIC)
+	{
+		if (m_pFrameSource) {
+			setFPS(m_pFrameSource->getFPS());
+		}
 	}
 	m_colorMode = colorMode;
 }
@@ -212,7 +213,6 @@ void RenderManager::render()
 	auto previousTime = steady_clock::now();
 
 	uint32_t* pColorArray = m_pLedControlController->getColorArray();
-	bool showBottom = m_pLedControlController->getBottomStatus();
 
 	// Check and adjust target properties (+ init FrameProcessor)
 	checkTargetProperties();
@@ -241,21 +241,24 @@ void RenderManager::render()
 
 		/* USER CODE - START */
 
+		/* DYNAMIC MODE */
+		if (m_colorMode == ColorMode::DYNAMIC)
+		{
+			if (m_pFrameSource)
+			{
+				// Get next frame from frame source
+				hasNextFrame = m_pFrameSource->getNextFrame(m_frame);
+				if (!hasNextFrame) {
+					break;
+				}
+				m_pLedControlController->setColorBySource(m_frame);
+				std::cout << "Set color by source: " << std::endl;
+			}
+		}
+
+		/* SIMULATION MODE */
 		if (m_renderMode == RenderMode::SIMULATE)
 		{
-			/* DYNAMIC MODE */
-			if (m_colorMode == ColorMode::DYNAMIC)
-			{
-				if (m_pFrameSource)
-				{
-					// Get next frame from frame source
-					hasNextFrame = m_pFrameSource->getNextFrame(m_frame);
-					if (!hasNextFrame) {
-						break;
-					}
-					m_pLedControlController->setColorBySource(m_frame);
-				}
-			}
 			// Resize the frame to target resolution
 			m_pSimController->resizeFrame(m_frame, resizedFrame, targetSize);
 			/* Simulate LED strip */
@@ -270,7 +273,7 @@ void RenderManager::render()
 		// count() -> used to get the duration value in seconds (as a double)
 		if (Debug::status()) 
 		{
-			std::cout << "Time elapsed: " << elapsed.count() << " s" << std::endl;
+			//std::cout << "Time elapsed: " << elapsed.count() << " s" << std::endl;
 			std::cout << "Current frame rate: " << 1.0 / elapsed.count() << " FPS" << std::endl;
 		}
 		
@@ -286,7 +289,7 @@ void RenderManager::render()
 			std::this_thread::sleep_for(sleepTimeMs);
 		} else {
 			if (Debug::status()) {
-				std::cerr << "Warning: Frame rendering took longer than the target frame duration.\n";
+				//std::cerr << "Warning: Frame rendering took longer than the target frame duration.\n";
 			}
 		}
 	}

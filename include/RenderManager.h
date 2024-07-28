@@ -11,6 +11,7 @@
 #include "controllers/VisualController.h"
 #include "controllers/LEDColorController.h"
 #include "controllers/SimulationController.h"
+#include "controllers/HardwareController.h"
 
 enum class RenderMode
 {
@@ -71,7 +72,6 @@ private:
 	FrameSource* m_pFrameSource;
 	cv::Mat m_frame;
 
-	void init();
 	void setStaticColor(uint32_t color);
 	void checkTargetProperties();
 	

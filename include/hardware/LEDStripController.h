@@ -12,7 +12,7 @@ public:
     virtual ~LEDStripController() {}
 
     // Pure virtual functions
-    virtual void init() = 0;
+    virtual void initialize() = 0;
     virtual void render() = 0;
 
     virtual void ledArraySetColor(uint32_t* colorArray) = 0;

@@ -7,7 +7,7 @@ $remoteUser = "rpi"
 $remoteHost = "192.168.1.109"
 $remotePath = "/home/rpi/shared/NeoLightFX"
 $remoteBuildPath = "${remotePath}/build"
-$appName = "example_RPI3"
+$appName = "NeoLightFX_Hardware"
 
 # Path to the private SSH key (update as necessary)
 $privateKeyPath = "/home/matic/.ssh/id_rsa"

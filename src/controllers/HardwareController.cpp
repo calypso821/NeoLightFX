@@ -1,4 +1,4 @@
-#include "HardwareController.h"
+#include "controllers/HardwareController.h"
 
 #include "hardware/rpi3/LEDStripControllerRpi3.h"
 
@@ -10,12 +10,14 @@ HardwareController::HardwareController(LEDColorController* colorController)
 
 HardwareController::~HardwareController()
 {
+	delete m_pLedStripController;
 }
 
 void HardwareController::initialize()
 {
+	int ledCount = m_pLedColorController->getLedCount();
 	m_pLedStripController = new LEDStripControllerRpi3{ ledCount };
-	m_pLedStripController->init();
+	m_pLedStripController->initialize();
 	m_pLedStripController->ledArrayClear();
 }
 

@@ -75,6 +75,7 @@ if(HARDWARE AND UNIX)
     add_library(rpi_ws281x STATIC ${RPI_WS281X_SOURCES})
 
     set(HARDWARE_SOURCES
+        ${PROJECT_SOURCE_DIR}/src/controllers/HardwareController.cpp
         ${PROJECT_SOURCE_DIR}/src/hardware/rpi3/LEDStripControllerRpi3.cpp
     )
 
@@ -88,4 +89,15 @@ if(HARDWARE AND UNIX)
     # Link the static library with the example application executables
     target_link_libraries(example_RPI3 PRIVATE rpi_ws281x)
     target_link_libraries(example_RPI3 PRIVATE ${OpenCV_LIBS})
+
+    # Exmaple executables
+    add_executable(NeoLightFX_Hardware
+        ${PROJECT_SOURCE_DIR}/main/main_hardware.cpp
+        ${SOURCES}
+        ${HARDWARE_SOURCES}
+    )
+
+    # Link the static library with the example application executables
+    target_link_libraries(NeoLightFX_Hardware PRIVATE rpi_ws281x)
+    target_link_libraries(NeoLightFX_Hardware PRIVATE ${OpenCV_LIBS})
 endif()
