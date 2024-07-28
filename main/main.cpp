@@ -3,7 +3,6 @@
 #include <opencv2/core/utils/logger.hpp>
 
 #include "controllers/LEDColorController.h"
-#include "controllers/InputSourceController.h"
 #include "sources/VideoSource.h"
 #include "sources/CaptureSource.h"
 #include "sources/ImageSource.h"
@@ -56,6 +55,10 @@ int main()
 		RenderManager renderManager{ &ledColorController };
 		// Assign address of renderManager object to global pointer
 		g_pRenderManager = &renderManager;
+
+		/* STATIC COLOR */
+		renderManager.setColorMode(ColorMode::STATIC);
+		renderManager.setColorByName(Color::Green);
 
 		/* VIDEO SORUCE */
 		renderManager.setFrameSource(&videoSource);

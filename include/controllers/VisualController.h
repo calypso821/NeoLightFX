@@ -1,17 +1,28 @@
 #ifndef VISUALCONTROLLER_H
 #define VISUALCONTROLLER_H
 
-#include <opencv2/opencv.hpp>
+#include "controllers/LEDColorController.h"
 
-class VisualController {
+class VisualController
+{
 public:
+	VisualController(LEDColorController* colorController)
+		: m_pLedColorController(colorController),
+		m_pColorArray(colorController->getColorArray())
+	{};
 	virtual ~VisualController() = default;
 
 	// Initialization and Cleanup
-	//virtual void initialize() = 0;
-	//virtual void shutdown() = 0;
+	virtual void initialize() {};
+	virtual void shutdown() {};
 
 	// Frame Handling
-	virtual renderFrame(const cv::Mat& frame) = 0;
+	virtual void renderFrame() = 0;
 	virtual void clearFrame() = 0;
+
+protected: 
+	LEDColorController* m_pLedColorController;
+	uint32_t* m_pColorArray;
 };
+
+#endif //VISUALCONTROLLER_H

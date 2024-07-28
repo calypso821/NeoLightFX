@@ -1,6 +1,5 @@
 #include "RenderManager.h"
 
-#include <chrono>
 #include <thread>
 
 #include "utils/Debug.h"
@@ -11,6 +10,7 @@ RenderManager::RenderManager(LEDColorController* colorController)
 	: m_running(false),
 	m_pLedControlController(colorController),
 	m_pFrameSource(nullptr),
+	m_pVisualController(nullptr),
 	m_pSimController(nullptr)
 {
 	init();
@@ -21,7 +21,8 @@ void RenderManager::init()
 	setRenderMode(RenderMode::SIMULATE);
 	setColorMode(ColorMode::STATIC);
 	setResolution(1280, 720);
-	setFPS(15.0f);
+	// Set FPS + frame duration
+	setFPS(10.0f);
 	setStaticColor(0xFF);
 	
 
@@ -42,14 +43,6 @@ std::string RenderManager::toString() const
 }
 
 /* Functions canot be set during runtime */
-void RenderManager::setFPS(float fps)
-{
-	if (isRunning()) {
-		std::cerr << "Cannot set FPS while running" << std::endl;
-		return;
-	}
-	m_fps = fps;
-}
 void RenderManager::setResolution(int width, int height)
 {
 	if (isRunning()) {
@@ -113,8 +106,10 @@ void RenderManager::setFrameSource(FrameSource* frameSource)
 
 	m_pFrameSource = frameSource;
 	// Set resolution of frame source
-	m_resolution = frameSource->getResolution();
-	m_fps = frameSource->getFPS();
+
+	auto res = frameSource->getResolution();
+	setResolution(res.first, res.second);
+	setFPS(frameSource->getFPS());
 }
 
 void RenderManager::setRenderMode(RenderMode renderMode)
@@ -124,23 +119,30 @@ void RenderManager::setRenderMode(RenderMode renderMode)
 		return;
 	}
 
-	if (renderMode == RenderMode::HARDWARE)
-	{
-		std::cerr << "Hardware render mode not supported in this version.\n";
-		return; // Exit early as hardware mode is not supported
-	}
-
 	if (renderMode == RenderMode::SIMULATE)
 	{
-		m_pSimController = new SimulationController{ m_pLedControlController };
+		m_pVisualController = new SimulationController{ m_pLedControlController };
 	}
 
 	m_renderMode = renderMode;
 }
 
 /* Functions can be set during runtime */
+void RenderManager::setFPS(float fps)
+{
+	// The count() method returns the number of milliseconds as a float,
+	// Calculate the frame duration in milliseconds with floating-point precision
+	m_frameDuration = std::chrono::duration<float, std::milli>(1000.0f / fps);
+	std::cout << "Frame duration: " << m_frameDuration.count() << " ms" << std::endl;
+	m_fps = fps;
+	
+}
 void RenderManager::setColorMode(ColorMode colorMode)
 {
+	if (colorMode == ColorMode::STATIC)
+	{
+		setFPS(10.0f);
+	}
 	m_colorMode = colorMode;
 }
 
@@ -149,16 +151,19 @@ void RenderManager::setStaticColor(uint32_t color)
 	// Set static color
 	m_pLedControlController->setStaticColor(color);
 
-	// Set static color of frame
-	if (m_renderMode == RenderMode::SIMULATE)
+	if (m_pVisualController)
 	{
-		m_frame = m_pSimController->createSolidColorFrame(m_resolution.first, m_resolution.second, color);
-		if (m_frame.empty()) {
-			std::cerr << "Solid frame initialization failed" << std::endl;
+		// Set static color of frame
+		if (m_renderMode == RenderMode::SIMULATE)
+		{
+			m_pSimController = dynamic_cast<SimulationController*>(m_pVisualController);
+			m_frame = m_pSimController->createSolidColorFrame(m_resolution.first, m_resolution.second, color);
+			if (m_frame.empty()) {
+				std::cerr << "Solid frame initialization failed" << std::endl;
+			}
 		}
 	}
 }
-
 
 void RenderManager::setColorByName(Color color)
 {
@@ -201,9 +206,6 @@ void RenderManager::render()
 	// Used for precise timing in milliseconds
 
 	// The count() method returns the number of milliseconds as a float,
-	// Calculate the frame duration in milliseconds with floating-point precision
-	auto frameDuration = duration<float, std::milli>(1000.0f / m_fps);
-	std::cout << "Frame duration: " << frameDuration.count() << " ms" << std::endl;
 
 	// Init previousTime
 	// auto -> automatically deduce type of variable
@@ -220,6 +222,9 @@ void RenderManager::render()
 
 	cv::Size targetSize(targetWidth, targetHeight);
 	cv::Mat resizedFrame;
+
+	// Visual controller initialization
+	m_pVisualController->initialize();
 
 	m_running.store(true);
 	bool hasNextFrame;
@@ -252,11 +257,14 @@ void RenderManager::render()
 				}
 			}
 			// Resize the frame to target resolution
-			cv::resize(m_frame, resizedFrame, targetSize);
+			m_pSimController->resizeFrame(m_frame, resizedFrame, targetSize);
 			/* Simulate LED strip */
 			m_pSimController->simulate(resizedFrame);
 		}
 
+		/* RENDER (display/led strip) */
+		m_pVisualController->renderFrame();
+		
 		/* USER CODE - END */
 
 		// count() -> used to get the duration value in seconds (as a double)
@@ -271,8 +279,8 @@ void RenderManager::render()
 		duration<float, std::milli> frameTime = frameEndTime - currentTime;
 		//std::cout << "Frame time: " << frameTime.count() << " ms" << std::endl;
 
-		if (frameTime < frameDuration) {
-			auto sleepTime = frameDuration - frameTime;
+		if (frameTime < m_frameDuration) {
+			auto sleepTime = m_frameDuration - frameTime;
 			//std::cout << "Sleep time: " << sleepTime.count() << " ms" << std::endl;
 			auto sleepTimeMs = duration_cast<std::chrono::milliseconds>(sleepTime);
 			std::this_thread::sleep_for(sleepTimeMs);
@@ -283,10 +291,9 @@ void RenderManager::render()
 		}
 	}
 
-	if (m_renderMode == RenderMode::SIMULATE)
-	{
-		cv::destroyAllWindows();
-	}
+	// Visual controller shutdown (clear windows...)
+	m_pVisualController->shutdown();
+
 	// Reset sleep timer percision 
 	resetPercisionTimer();
 	std::cout << "Rendering stopped..." << std::endl;

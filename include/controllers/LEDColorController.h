@@ -22,6 +22,7 @@ public:
 
     void setStaticColor(uint32_t color);
     void setColorBySource(cv::Mat frame);
+    void clearColorArray();
 
     //void setColorByName(Color color);
     //void setColorByHexCode(uint32_t color);
@@ -40,7 +41,6 @@ private:
     uint32_t* m_pColorArray;
 
     void initColorArray();
-    void clearColorArray();
 };
 
 #endif // LEDCOLORCONTROLLER_H
