@@ -4,7 +4,9 @@
 CaptureSource::CaptureSource(int device)
 {
     openDevice(device);
-    setProperties(640, 480, 66);
+    // 800x600 ... 55 FPS
+    // 640x480 ... 60 FPS
+    setProperties(640, 480, 60);
     std::cout << "Capture source initialization: Success" << std::endl;
     std::cout << this->toString() << std::endl;
 }
@@ -19,9 +21,8 @@ CaptureSource::CaptureSource(int device, int width, int height, int fps)
 void CaptureSource::openDevice(int device)
 {
     std::cout << "Opening capture device..." << std::endl;
-    //std::string pipeline = "v4l2src ! videoconvert ! appsink";
-    //cap.open(pipeline, cv::CAP_GSTREAMER);
 
+    /* LINUX cap open */
     cap.open(device, cv::CAP_V4L2);
     if (!cap.isOpened()) {
         throw std::runtime_error("Error opening capture card");
@@ -52,5 +53,6 @@ void CaptureSource::setProperties(int width, int height, int fps)
     }
     cap.set(cv::CAP_PROP_FRAME_WIDTH, width);
     cap.set(cv::CAP_PROP_FRAME_HEIGHT, height);
+    cap.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
     cap.set(cv::CAP_PROP_FPS, fps);
 }

@@ -17,7 +17,6 @@ public:
 
     virtual void ledArraySetColor(uint32_t* colorArray) = 0;
     virtual void ledArrayClear() = 0;
-    virtual void setBrightness(int brightness) = 0;
 
 protected:
     int m_ledCount; // Number of LEDs

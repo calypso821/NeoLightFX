@@ -27,7 +27,7 @@ int main()
 	try
 	{
 		std::signal(SIGINT, signalHandler);
-		Debug::set(true);
+		Debug::set(false);
 
 		// Set OpenCV logging level to show only errors
 		//cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_ERROR);
@@ -79,7 +79,6 @@ int main()
 
 		/* CAPTURE SORUCE */
 		 renderManager.setFrameSource(&capSource);
-		 //renderManager.setFPS(15);
 		 renderManager.setColorMode(ColorMode::DYNAMIC);
 		 std::cout << renderManager.toString() << std::endl;
 

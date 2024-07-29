@@ -83,13 +83,3 @@ void LEDColorController::setColorBySource(cv::Mat frame)
 {
     m_frameProcessor.processFrame(m_pColorArray, frame);
 }
-
-//void LEDColorController::setColorByName(Color color)
-//{
-//    setStaticColor(static_cast<uint32_t>(color));
-//}
-//
-//void LEDColorController::setColorByHexCode(uint32_t color)
-//{
-//    setStaticColor(color);
-//}

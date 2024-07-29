@@ -252,7 +252,6 @@ void RenderManager::render()
 					break;
 				}
 				m_pLedControlController->setColorBySource(m_frame);
-				std::cout << "Set color by source: " << std::endl;
 			}
 		}
 
@@ -273,7 +272,7 @@ void RenderManager::render()
 		// count() -> used to get the duration value in seconds (as a double)
 		if (Debug::status()) 
 		{
-			//std::cout << "Time elapsed: " << elapsed.count() << " s" << std::endl;
+			std::cout << "Time elapsed: " << elapsed.count() << " s" << std::endl;
 			std::cout << "Current frame rate: " << 1.0 / elapsed.count() << " FPS" << std::endl;
 		}
 		
@@ -289,7 +288,7 @@ void RenderManager::render()
 			std::this_thread::sleep_for(sleepTimeMs);
 		} else {
 			if (Debug::status()) {
-				//std::cerr << "Warning: Frame rendering took longer than the target frame duration.\n";
+				std::cerr << "Warning: Frame rendering took longer than the target frame duration.\n";
 			}
 		}
 	}

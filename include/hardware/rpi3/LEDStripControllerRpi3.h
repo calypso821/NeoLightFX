@@ -18,7 +18,6 @@ public:
 
 	void ledArraySetColor(uint32_t* colorArray) override;
 	void ledArrayClear() override;
-	void setBrightness(int brightness) override;
 
 private:
 	ws2811_t m_ledArray;

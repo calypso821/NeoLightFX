@@ -36,4 +36,5 @@ void HardwareController::renderFrame()
 void HardwareController::clearFrame()
 {
 	m_pLedStripController->ledArrayClear();
+	m_pLedStripController->render();
 }
