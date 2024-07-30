@@ -13,7 +13,7 @@ public:
     LEDColorController(int ledNum_width, int ledNum_height, bool showBotttom);
     ~LEDColorController();
 
-    void initFrameProcessor(int width, int height);
+    void initializeFrameProcessor(int width, int height);
 
     uint32_t* getColorArray();
     int getColorArraySize();
@@ -23,20 +23,19 @@ public:
 
     void setStaticColor(uint32_t color);
     void setColorBySource(cv::Mat frame);
+    void setBrightness(int value);
     void clearColorArray();
 
-    //void setColorByName(Color color);
-    //void setColorByHexCode(uint32_t color);
+    //void applyBrightness(bool greyscaleCorrection);
 
 private:
     int m_ledNum_width;
     int m_ledNum_height;
-
-    int m_brightness;
     bool m_showBottom;
 
+    int m_brightness;
 
-    FrameProcessor m_frameProcessor;
+    FrameProcessor* m_frameProcessor;
 
     int m_colorArraySize;
     uint32_t* m_pColorArray;

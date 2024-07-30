@@ -3,12 +3,12 @@
 #include <thread>
 
 #include "utils/Debug.h"
-#include "utils/EnumToString.h"
-#include "utils/percision_timer.h"
+#include "utils/mode_utils.h"
+#include "utils/timer_utils.h"
 
 RenderManager::RenderManager(LEDColorController* colorController)
 	: m_running(false),
-	m_pLedControlController(colorController),
+	m_pLedColorController(colorController),
 	m_pFrameSource(nullptr),
 	m_pVisualController(nullptr),
 	m_pSimController(nullptr)
@@ -49,8 +49,8 @@ void RenderManager::scaleResolution(float scalar)
 		std::cerr << "Cannot set resolution while running" << std::endl;
 		return;
 	}
-	int new_width = m_resolution.first * scalar;
-	int new_height = m_resolution.second * scalar;
+	int new_width = static_cast<int>(m_resolution.first * scalar);
+	int new_height = static_cast<int>(m_resolution.second * scalar);
 	m_resolution = std::make_pair(new_width, new_height);
 }
 
@@ -69,7 +69,7 @@ void RenderManager::checkTargetProperties()
 				      << std::endl;
 		}
 		// Initialize FrameProcessor with width, height
-		m_pLedControlController->initFrameProcessor(m_resolution.first, m_resolution.second);
+		m_pLedColorController->initializeFrameProcessor(m_resolution.first, m_resolution.second);
 
 		/* FPS CHECK */
 		float max_fps = m_pFrameSource->getFPS();
@@ -113,11 +113,11 @@ void RenderManager::setRenderMode(RenderMode renderMode)
 
 	if (renderMode == RenderMode::SIMULATE)
 	{
-		m_pVisualController = new SimulationController{ m_pLedControlController };
+		m_pVisualController = new SimulationController{ m_pLedColorController };
 	}
 	if (renderMode == RenderMode::HARDWARE)
 	{
-		m_pVisualController = new HardwareController{ m_pLedControlController };
+		m_pVisualController = new HardwareController{ m_pLedColorController };
 	}
 
 	m_renderMode = renderMode;
@@ -150,7 +150,7 @@ void RenderManager::setColorMode(ColorMode colorMode)
 void RenderManager::setStaticColor(uint32_t color)
 {
 	// Set static color
-	m_pLedControlController->setStaticColor(color);
+	m_pLedColorController->setStaticColor(color);
 
 	if (m_pVisualController)
 	{
@@ -188,6 +188,7 @@ bool RenderManager::isRunning()
 
 void RenderManager::render()
 {
+	const int GREYSCALE_CORRECTION = true;
 	// Set sleep timer percision 
 	setPercisionTimer();
 
@@ -212,7 +213,7 @@ void RenderManager::render()
 	// auto -> automatically deduce type of variable
 	auto previousTime = steady_clock::now();
 
-	uint32_t* pColorArray = m_pLedControlController->getColorArray();
+	uint32_t* pColorArray = m_pLedColorController->getColorArray();
 
 	// Check and adjust target properties (+ init FrameProcessor)
 	checkTargetProperties();
@@ -251,7 +252,7 @@ void RenderManager::render()
 				if (!hasNextFrame) {
 					break;
 				}
-				m_pLedControlController->setColorBySource(m_frame);
+				m_pLedColorController->setColorBySource(m_frame);
 			}
 		}
 

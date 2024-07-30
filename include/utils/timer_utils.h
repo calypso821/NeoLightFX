@@ -1,5 +1,5 @@
-#ifndef PERCISION_TIMER_H
-#define PERCISION_TIMER_H
+#ifndef TIMER_UTILS_H
+#define TIMER_UTILS_H
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>
@@ -8,4 +8,4 @@
 void setPercisionTimer();
 void resetPercisionTimer();
 
-#endif // PERCISION_TIMER_H
+#endif // TIMER_UTILS_H

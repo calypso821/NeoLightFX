@@ -42,8 +42,9 @@ set(SOURCES
     ${PROJECT_SOURCE_DIR}/src/FrameProcessor.cpp
     ${PROJECT_SOURCE_DIR}/src/RenderManager.cpp
     ${PROJECT_SOURCE_DIR}/src/utils/Debug.cpp
-    ${PROJECT_SOURCE_DIR}/src/utils/EnumToString.cpp
-    ${PROJECT_SOURCE_DIR}/src/utils/percision_timer.cpp
+    ${PROJECT_SOURCE_DIR}/src/utils/mode_utils.cpp
+    ${PROJECT_SOURCE_DIR}/src/utils/timer_utils.cpp
+    ${PROJECT_SOURCE_DIR}/src/utils/color_processing_utils.cpp
 )
 
 # SIMULATION executables

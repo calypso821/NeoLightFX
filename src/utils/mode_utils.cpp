@@ -1,4 +1,4 @@
-#include "utils/EnumToString.h"
+#include "utils/mode_utils.h"
 
 std::string renderModeToString(RenderMode mode) {
     switch (mode) {

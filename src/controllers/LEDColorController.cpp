@@ -4,7 +4,7 @@
 
 
 LEDColorController::LEDColorController(int ledNum_width, int ledNum_height, bool showBottom)
-    : m_frameProcessor(ledNum_width, ledNum_height, showBottom),
+    : m_frameProcessor(nullptr),
     m_ledNum_width(ledNum_width),
     m_ledNum_height(ledNum_height),
     m_showBottom(showBottom),
@@ -22,11 +22,10 @@ LEDColorController::~LEDColorController()
     delete[] m_pColorArray;
 }
 
-void LEDColorController::initFrameProcessor(int width, int height)
+void LEDColorController::initializeFrameProcessor(int width, int height)
 {
     // INIT ImageProcessor
-    //m_frameProcessor = ImageProcessor(m_ledNum_width, m_ledNum_height, m_showBottom);
-    m_frameProcessor.init(width, height);
+    m_frameProcessor = new FrameProcessor(m_ledNum_width, m_ledNum_height, m_showBottom, width, height);
 }
 
 void LEDColorController::initColorArray()
@@ -81,5 +80,10 @@ void LEDColorController::setStaticColor(uint32_t color)
 
 void LEDColorController::setColorBySource(cv::Mat frame)
 {
-    m_frameProcessor.processFrame(m_pColorArray, frame);
+    m_frameProcessor->processFrame(m_pColorArray, frame);
+}
+
+void LEDColorController::setBrightness(int value)
+{
+    m_brightness = std::clamp(value, 0, 100);
 }

@@ -1,24 +1,23 @@
 #include "FrameProcessor.h"
 
-//TODO: Input paramter
-#define LED_WIDTH   50
-#define LED_HEIGHT  20
-#define DETECT_BLACK_BARS  true
+#include "utils/color_processing_utils.h"
 
 // Define the static constants
 const float FrameProcessor::HEIGHT_PATCH_RATIO = 0.2f; // 30% of height
 const float FrameProcessor::WIDTH_PATCH_RATIO = 0.2f;  // 30% of width
 const float FrameProcessor::BLACK_BAR_RATIO = 0.125f;   // 10% of height
+const bool FrameProcessor::DETECT_BLACK_BARS = true;   // automatically deteck black bars
 
-FrameProcessor::FrameProcessor(int ledNum_width, int ledNum_height, bool botttom)
+FrameProcessor::FrameProcessor(int ledNum_width, int ledNum_height, bool botttom, int width, int height)
+    : m_ledNum_width(ledNum_width),
+    m_ledNum_height(ledNum_height),
+    m_bottom(botttom)
 {
-    m_ledNum_width = ledNum_width;
-    m_ledNum_height = ledNum_height;
-
-    m_bottom = botttom;
+    // Default init
+    initialize(width, height);
 }
 
-void FrameProcessor::init(int width, int height)
+void FrameProcessor::initialize(int width, int height)
 {
     m_width = width;
     m_height = height;
@@ -33,7 +32,22 @@ void FrameProcessor::init(int width, int height)
 
     m_blackBar_height = static_cast<int>(height * BLACK_BAR_RATIO);
     m_blackBarOffset = 0;
-    m_transitionSpeed = 1;
+    m_transitionSpeed = 100;
+}
+
+void FrameProcessor::processFrame(uint32_t* colorArray, cv::Mat frame)
+{
+    if (DETECT_BLACK_BARS) {
+        processBlackBars(frame);
+    }
+
+    processHorizontal(colorArray, frame);
+    processVertical(colorArray, frame);
+}
+
+void FrameProcessor::setTransitionSpeed(int value)
+{
+    m_transitionSpeed = std::clamp(value, 0, 100);
 }
 
 int FrameProcessor::getMeanBlack(cv::Mat blackBar)
@@ -79,6 +93,8 @@ void FrameProcessor::processBlackBars(cv::Mat frame) {
     }
 }
 
+
+
 // TODO: Transition
 //int FrameProcessor::getMean(int old_color, cv::Scalar avg, int num) {
 //    int red_n = static_cast<int>(avg[2]);
@@ -98,6 +114,16 @@ void FrameProcessor::processBlackBars(cv::Mat frame) {
 //    }
 //    return (red_n << 16) + (green_n << 8) + blue_n;
 //}
+void FrameProcessor::setNewColor(uint32_t* colorArray, int index, uint32_t newColor)
+{
+    // 1. Greyscale correction
+    newColor = applyGreyscaleCorrection(newColor);
+    // 2. Apply Brightness correction
+    newColor = applyBrightnessCorrection(newColor, 100);
+    // 3. Apply tranistion correction
+    newColor = applyTransitionCorrection(colorArray[index], newColor, 30);
+    colorArray[index] = newColor;
+}
 
 uint32_t FrameProcessor::toUint32Color(cv::Scalar color)
 {
@@ -124,9 +150,8 @@ void FrameProcessor::processHorizontal(uint32_t* array, cv::Mat frame)
             patch_height
         ));
         cv::Scalar meanColor_top = cv::mean(patch_top);
-        int pos_t = m_ledNum_height;
-        //array[pos_t + i] = getMean(array[pos_t + i], avg_top, averaging);
-        array[pos_t + i] = toUint32Color(meanColor_top);
+        int pos_t = i + m_ledNum_height;
+        setNewColor(array, pos_t, toUint32Color(meanColor_top));
 
         if (m_bottom)
         {
@@ -139,9 +164,8 @@ void FrameProcessor::processHorizontal(uint32_t* array, cv::Mat frame)
                 patch_height
             ));
             cv::Scalar meanColor_bot = cv::mean(patch_bot);
-            int pos_b = m_ledNum_height * 2 + m_ledNum_width;
-            //array[pos_b + i] = getMean(array[pos_b + i], avg_bot, averaging);
-            array[pos_b + i] = toUint32Color(meanColor_bot);
+            int pos_b = i + m_ledNum_height * 2 + m_ledNum_width;
+            setNewColor(array, pos_b, toUint32Color(meanColor_bot));
         }
     }
 }
@@ -162,10 +186,9 @@ void FrameProcessor::processVertical(uint32_t* array, cv::Mat frame)
             patch_height
         ));
         cv::Scalar meanColor_left = cv::mean(patch_left);
-        int pos_l = 0;
-        // TODO: Transition smooth
-        //array[pos_l + i] = getMean(array[pos_l + i], avg_left, averaging);
-        array[pos_l + i] = toUint32Color(meanColor_left);
+        int pos_l = i;
+        setNewColor(array, pos_l, toUint32Color(meanColor_left));
+
 
         // Right side (Top -> Bottom)
         cv::Mat patch_right = frame(cv::Rect(
@@ -175,18 +198,7 @@ void FrameProcessor::processVertical(uint32_t* array, cv::Mat frame)
             patch_height
         ));
         cv::Scalar meanColor_right = cv::mean(patch_right);
-        int pos_r = m_ledNum_height + m_ledNum_width;
-        //array[pos_r + i] = getMean(array[pos_r + i], avg_right, averaging);
-        array[pos_r + i] = toUint32Color(meanColor_right);
+        int pos_r = i + m_ledNum_height + m_ledNum_width;
+        setNewColor(array, pos_r, toUint32Color(meanColor_right));
     }
-}
-
-void FrameProcessor::processFrame(uint32_t* colorArray, cv::Mat frame)
-{
-    if (DETECT_BLACK_BARS) {
-        processBlackBars(frame);
-    }
-
-    processHorizontal(colorArray, frame);
-    processVertical(colorArray, frame);
 }
