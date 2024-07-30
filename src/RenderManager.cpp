@@ -273,7 +273,7 @@ void RenderManager::render()
 		// count() -> used to get the duration value in seconds (as a double)
 		if (Debug::status()) 
 		{
-			std::cout << "Time elapsed: " << elapsed.count() << " s" << std::endl;
+			//std::cout << "Time elapsed: " << elapsed.count() << " s" << std::endl;
 			std::cout << "Current frame rate: " << 1.0 / elapsed.count() << " FPS" << std::endl;
 		}
 		

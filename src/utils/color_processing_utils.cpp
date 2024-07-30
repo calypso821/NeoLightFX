@@ -1,5 +1,7 @@
 #include "utils/color_processing_utils.h"
 
+#include <iostream>
+#include <sstream>
 #include <cmath>
 #include <cstdlib>
 #include <algorithm>
@@ -8,7 +10,7 @@
 const float GAMMA = 2.2f;
 
 // Greyscale threshold (diffrence in colors)
-const int GREYSCALE_THRESHOLD = 20;
+const int GREYSCALE_THRESHOLD = 15;
 
 // Coolor component scale factors
 const float FACTOR_R = 1.0f;
@@ -17,7 +19,7 @@ const float FACTOR_B = 0.8f;
 
 uint8_t lerp(uint8_t a, uint8_t b, float t)
 {
-	return static_cast<uint8_t>(std::round((b - a) * t + a));
+	return static_cast<uint8_t>(std::floor((b - a) * t + a));
 }
 
 uint32_t applyTransitionCorrection(uint32_t oldColor, uint32_t newColor, int transitionSpeed)
@@ -45,6 +47,15 @@ uint32_t applyTransitionCorrection(uint32_t oldColor, uint32_t newColor, int tra
     uint8_t blendedGreen = lerp(oldGreen, newGreen, alpha);
     uint8_t blendedBlue = lerp(oldBlue, newBlue, alpha);
 
+    //std::cout << static_cast<int>(blendedRed) << ','
+    //    << static_cast<int>(blendedGreen) << ','
+    //    << static_cast<int>(blendedBlue) << std::endl;
+
+    // Set components to 0 if they are less than 10
+    /*if (blendedRed < 10) blendedRed = 0;
+    if (blendedGreen < 10) blendedGreen = 0;
+    if (blendedBlue < 10) blendedBlue = 0;*/
+
     // Reassemble the 32-bit color value from the blended components
     return (blendedRed << 16) | (blendedGreen << 8) | blendedBlue;
 }
@@ -68,6 +79,7 @@ uint32_t applyBrightnessCorrection(uint32_t color, int brightness)
     return (red << 16) | (green << 8) | blue;
 }
 
+
 uint32_t applyGreyscaleCorrection(uint32_t color)
 {
     int red = (color >> 16) & 0xFF;
@@ -89,4 +101,17 @@ uint32_t applyGreyscaleCorrection(uint32_t color)
     }
 
     return color;
+}
+
+std::string uint32ToString(uint32_t color) {
+    // Extract RGB components
+    uint8_t r = (color >> 16) & 0xFF;
+    uint8_t g = (color >> 8) & 0xFF;
+    uint8_t b = color & 0xFF;
+
+    // Create a string stream
+    std::stringstream ss;
+    ss << static_cast<int>(r) << ", " << static_cast<int>(g) << ", " << static_cast<int>(b);
+
+    return ss.str();
 }

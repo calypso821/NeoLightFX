@@ -1,8 +1,9 @@
+#include "hardware/rpi3/LEDStripControllerRpi3.h"
+
 #include <iostream>
 #include <cstring>
 
-#include "hardware/rpi3/LEDStripControllerRpi3.h"
-
+#include "utils/color_processing_utils.h"
 
 // WS2811 definitions
 #define TARGET_FREQ             800000
@@ -33,7 +34,7 @@ void LEDStripControllerRpi3::initialize() {
                 .invert = 0,
                 .count = m_ledCount,
                 .strip_type = STRIP_TYPE,
-                .brightness = 150,
+                .brightness = 255,
             },
         },
     };
@@ -69,7 +70,8 @@ void LEDStripControllerRpi3::render() {
 void LEDStripControllerRpi3::ledArraySetColor(uint32_t* colorArray)
 {
     for (int x = 0; x < m_ledCount; x++) {
-        m_ledArray.channel[0].leds[x] = colorArray[x];
+        m_ledArray.channel[0].leds[x] = applyBrightnessCorrection(colorArray[x], 40);
+        //m_ledArray.channel[0].leds[x] = colorArray[x];
     }
 }
 

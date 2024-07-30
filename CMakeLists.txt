@@ -81,6 +81,7 @@ if(HARDWARE AND UNIX)
     )
 
     # Exmaple executables
+    #[[
     add_executable(example_RPI3
         ${PROJECT_SOURCE_DIR}/example/rpi3.cpp
         ${SOURCES}
@@ -90,6 +91,7 @@ if(HARDWARE AND UNIX)
     # Link the static library with the example application executables
     target_link_libraries(example_RPI3 PRIVATE rpi_ws281x)
     target_link_libraries(example_RPI3 PRIVATE ${OpenCV_LIBS})
+      ]]
 
     # Exmaple executables
     add_executable(NeoLightFX_Hardware

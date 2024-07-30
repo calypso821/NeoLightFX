@@ -1,6 +1,7 @@
 #ifndef COLOR_PROCESSING_UTILS_H
 #define COLOR_PROCESSING_UTILS_H
 
+#include <string>
 #include <cstdint>
 
 extern const float GAMMA;
@@ -14,5 +15,7 @@ uint32_t applyTransitionCorrection(uint32_t oldColor, uint32_t newColor, int tra
 
 uint32_t applyBrightnessCorrection(uint32_t color, int brightness);
 uint32_t applyGreyscaleCorrection(uint32_t color);
+
+std::string uint32ToString(uint32_t color);
 
 #endif //COLOR_PROCESSING_UTILS_H

@@ -3,7 +3,7 @@
 #include "utils/color_processing_utils.h"
 
 // Define the static constants
-const float FrameProcessor::HEIGHT_PATCH_RATIO = 0.2f; // 30% of height
+const float FrameProcessor::HEIGHT_PATCH_RATIO = 0.3f; // 30% of height
 const float FrameProcessor::WIDTH_PATCH_RATIO = 0.2f;  // 30% of width
 const float FrameProcessor::BLACK_BAR_RATIO = 0.125f;   // 10% of height
 const bool FrameProcessor::DETECT_BLACK_BARS = true;   // automatically deteck black bars
@@ -118,10 +118,10 @@ void FrameProcessor::setNewColor(uint32_t* colorArray, int index, uint32_t newCo
 {
     // 1. Greyscale correction
     newColor = applyGreyscaleCorrection(newColor);
-    // 2. Apply Brightness correction
-    newColor = applyBrightnessCorrection(newColor, 100);
-    // 3. Apply tranistion correction
-    newColor = applyTransitionCorrection(colorArray[index], newColor, 30);
+    //std::cout << "Grayscale: " << uint32ToString(newColor) << std::endl;
+    // 2. Apply tranistion correction
+    newColor = applyTransitionCorrection(colorArray[index], newColor, 5);
+    //std::cout << "Transition: " << uint32ToString(newColor) << std::endl;
     colorArray[index] = newColor;
 }
 

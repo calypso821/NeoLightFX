@@ -27,7 +27,7 @@ int main()
 	try
 	{
 		std::signal(SIGINT, signalHandler);
-		Debug::set(false);
+		Debug::set(true);
 
 		// Set OpenCV logging level to show only errors
 		//cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_ERROR);
@@ -61,7 +61,7 @@ int main()
 
 		/* STATIC COLOR */
 		renderManager.setColorMode(ColorMode::STATIC);
-		renderManager.setColorByName(Color::Green);
+		renderManager.setColorByName(Color::White);
 
 		/* VIDEO SORUCE */
 		//renderManager.setFrameSource(&videoSource);
