@@ -65,7 +65,7 @@ private:
 	float m_fps;
 	std::chrono::duration<float, std::milli> m_frameDuration;
 
-	LEDColorController* m_pLedControlController;
+	LEDColorController* m_pLedColorController;
 	VisualController* m_pVisualController;
 	SimulationController* m_pSimController;
 	FrameSource* m_pFrameSource;

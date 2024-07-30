@@ -20,6 +20,7 @@ void CaptureSource::openDevice(int device)
 {
     std::cout << "Opening capture device..." << std::endl;
 
+    /* Windows cap open */
     cap.open(device);
     if (!cap.isOpened()) {
         throw std::runtime_error("Error opening capture card");
