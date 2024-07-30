@@ -26,14 +26,6 @@ uint32_t applyTransitionCorrection(uint32_t oldColor, uint32_t newColor, int tra
 {
     float alpha = transitionSpeed / 100.0f;
     // TODO: Add dt (delta time)
-    /*uint32_t blendedColor = 0;
-
-    for (int shift = 0; shift <= 16; shift += 8) {
-        uint8_t oldComponent = (oldColor >> shift) & 0xFF;
-        uint8_t newComponent = (newColor >> shift) & 0xFF;
-        uint8_t blendedComponent = lerp(oldComponent, newComponent, alpha);
-        blendedColor |= (blendedComponent << shift);
-    }*/
 
     uint8_t oldRed = (oldColor >> 16) & 0xFF;
     uint8_t oldGreen = (oldColor >> 8) & 0xFF;
@@ -47,15 +39,6 @@ uint32_t applyTransitionCorrection(uint32_t oldColor, uint32_t newColor, int tra
     uint8_t blendedGreen = lerp(oldGreen, newGreen, alpha);
     uint8_t blendedBlue = lerp(oldBlue, newBlue, alpha);
 
-    //std::cout << static_cast<int>(blendedRed) << ','
-    //    << static_cast<int>(blendedGreen) << ','
-    //    << static_cast<int>(blendedBlue) << std::endl;
-
-    // Set components to 0 if they are less than 10
-    /*if (blendedRed < 10) blendedRed = 0;
-    if (blendedGreen < 10) blendedGreen = 0;
-    if (blendedBlue < 10) blendedBlue = 0;*/
-
     // Reassemble the 32-bit color value from the blended components
     return (blendedRed << 16) | (blendedGreen << 8) | blendedBlue;
 }
@@ -65,6 +48,7 @@ uint32_t applyBrightnessCorrection(uint32_t color, int brightness)
     float factor = brightness / 100.f;
     // Gamma corrction
     factor = std::pow(factor, GAMMA);
+    // Maybe I do linear? 
 
     int red = (color >> 16) & 0xFF;
     int green = (color >> 8) & 0xFF;
