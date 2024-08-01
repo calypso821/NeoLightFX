@@ -8,10 +8,14 @@
 #include <opencv2/core/mat.hpp>
 
 #include "sources/FrameSource.h"
+#include "FrameProcessor.h"
 #include "controllers/VisualController.h"
 #include "controllers/LEDColorController.h"
 #include "controllers/SimulationController.h"
+
+#ifdef HARDWARE_MODE
 #include "controllers/HardwareController.h"
+#endif
 
 enum class RenderMode
 {
@@ -70,6 +74,7 @@ private:
 	VisualController* m_pVisualController;
 	SimulationController* m_pSimController;
 	FrameSource* m_pFrameSource;
+	FrameProcessor* m_pFrameProcessor;
 	cv::Mat m_frame;
 
 	void setStaticColor(uint32_t color);

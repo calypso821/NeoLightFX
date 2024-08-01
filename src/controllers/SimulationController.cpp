@@ -92,9 +92,9 @@ void SimulationController::simulate(const cv::Mat& frame) {
                 ),
                 // Color
                 cv::Scalar(
-                    (m_pColorArray[i + offset_t] >> 16) & 0xFF,
+                    m_pColorArray[i + offset_t] & 0xFF,
                     (m_pColorArray[i + offset_t] >> 8) & 0xFF,
-                    m_pColorArray[i + offset_t] & 0xFF
+                    (m_pColorArray[i + offset_t] >> 16) & 0xFF
                 ),
                 cv::FILLED
             );
@@ -128,9 +128,9 @@ void SimulationController::simulate(const cv::Mat& frame) {
                     ),
                     // Color
                     cv::Scalar(
-                        (m_pColorArray[i + offset_b] >> 16) & 0xFF,
-                        (m_pColorArray[i + offset_b] >> 8) & 0xFF,
-                        m_pColorArray[i + offset_b] & 0xFF
+                    m_pColorArray[i + offset_b] & 0xFF,
+                    (m_pColorArray[i + offset_b] >> 8) & 0xFF,
+                    (m_pColorArray[i + offset_b] >> 16) & 0xFF
                     ),
                     cv::FILLED
                 );
@@ -168,9 +168,9 @@ void SimulationController::simulate(const cv::Mat& frame) {
                 ),
                 // Color
                 cv::Scalar(
-                    (m_pColorArray[i + offset_l] >> 16) & 0xFF,
+                    m_pColorArray[i + offset_l] & 0xFF,
                     (m_pColorArray[i + offset_l] >> 8) & 0xFF,
-                    m_pColorArray[i + offset_l] & 0xFF
+                    (m_pColorArray[i + offset_l] >> 16) & 0xFF
                 ),
                 cv::FILLED
             );
@@ -202,9 +202,9 @@ void SimulationController::simulate(const cv::Mat& frame) {
                 ),
                 // Color
                 cv::Scalar(
-                    (m_pColorArray[i + offset_r] >> 16) & 0xFF,
+                    m_pColorArray[i + offset_r] & 0xFF,
                     (m_pColorArray[i + offset_r] >> 8) & 0xFF,
-                    m_pColorArray[i + offset_r] & 0xFF
+                    (m_pColorArray[i + offset_r] >> 16) & 0xFF
                 ),
                 cv::FILLED
             );

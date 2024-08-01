@@ -47,6 +47,31 @@ set(SOURCES
     ${PROJECT_SOURCE_DIR}/src/utils/color_processing_utils.cpp
 )
 
+# Define a macro for conditional compilation
+if(HARDWARE)
+    add_compile_definitions(HARDWARE_MODE)
+    set(HARDWARE_SOURCES
+        ${PROJECT_SOURCE_DIR}/src/controllers/HardwareController.cpp
+        ${PROJECT_SOURCE_DIR}/src/hardware/rpi3/LEDStripControllerRpi3.cpp
+    )
+    list(APPEND SOURCES ${HARDWARE_SOURCES})
+
+    # Add the rpi_ws281x source files for UNIX
+    if(UNIX)
+        set(RPI_WS281X_SOURCES
+            ${PROJECT_SOURCE_DIR}/third_party/rpi_281x/ws2811.c
+            ${PROJECT_SOURCE_DIR}/third_party/rpi_281x/rpihw.c
+            ${PROJECT_SOURCE_DIR}/third_party/rpi_281x/pwm.c
+            ${PROJECT_SOURCE_DIR}/third_party/rpi_281x/dma.c
+            ${PROJECT_SOURCE_DIR}/third_party/rpi_281x/pcm.c
+            ${PROJECT_SOURCE_DIR}/third_party/rpi_281x/mailbox.c
+        )
+
+        # Create a static library from the submodule source files
+        add_library(rpi_ws281x STATIC ${RPI_WS281X_SOURCES})
+    endif()
+endif()
+
 # SIMULATION executables
 if(SIMULATE)
     add_executable(NeoLightFX_Simulator
@@ -60,47 +85,25 @@ if(SIMULATE)
     endif()
 endif()
 
-# HARDWARE executables
+# HARDWARE executable
 if(HARDWARE AND UNIX)
-    # Add the rpi_ws281x source files
-    set(RPI_WS281X_SOURCES
-        ${PROJECT_SOURCE_DIR}/third_party/rpi_281x/ws2811.c
-        ${PROJECT_SOURCE_DIR}/third_party/rpi_281x/rpihw.c
-        ${PROJECT_SOURCE_DIR}/third_party/rpi_281x/pwm.c
-        ${PROJECT_SOURCE_DIR}/third_party/rpi_281x/dma.c
-        ${PROJECT_SOURCE_DIR}/third_party/rpi_281x/pcm.c
-        ${PROJECT_SOURCE_DIR}/third_party/rpi_281x/mailbox.c
+    add_executable(NeoLightFX_Hardware
+        ${PROJECT_SOURCE_DIR}/main/main_hardware.cpp
+        ${SOURCES}
     )
-
-    # Create a static library from the submodule source files
-    add_library(rpi_ws281x STATIC ${RPI_WS281X_SOURCES})
-
-    set(HARDWARE_SOURCES
-        ${PROJECT_SOURCE_DIR}/src/controllers/HardwareController.cpp
-        ${PROJECT_SOURCE_DIR}/src/hardware/rpi3/LEDStripControllerRpi3.cpp
-    )
+    # Link the static library with the example application executables
+    target_link_libraries(NeoLightFX_Hardware PRIVATE rpi_ws281x)
+    target_link_libraries(NeoLightFX_Hardware PRIVATE ${OpenCV_LIBS})
 
     # Exmaple executables
     #[[
     add_executable(example_RPI3
         ${PROJECT_SOURCE_DIR}/example/rpi3.cpp
         ${SOURCES}
-        ${HARDWARE_SOURCES}
     )
 
     # Link the static library with the example application executables
     target_link_libraries(example_RPI3 PRIVATE rpi_ws281x)
     target_link_libraries(example_RPI3 PRIVATE ${OpenCV_LIBS})
       ]]
-
-    # Exmaple executables
-    add_executable(NeoLightFX_Hardware
-        ${PROJECT_SOURCE_DIR}/main/main_hardware.cpp
-        ${SOURCES}
-        ${HARDWARE_SOURCES}
-    )
-
-    # Link the static library with the example application executables
-    target_link_libraries(NeoLightFX_Hardware PRIVATE rpi_ws281x)
-    target_link_libraries(NeoLightFX_Hardware PRIVATE ${OpenCV_LIBS})
 endif()

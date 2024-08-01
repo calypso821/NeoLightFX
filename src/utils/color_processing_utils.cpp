@@ -55,9 +55,9 @@ uint32_t applyBrightnessCorrection(uint32_t color, int brightness)
     int blue = color & 0xFF;
 
     // Adjust brightness
-    red = std::round(std::min(255.0f, red * factor));
-    green = std::round(std::min(255.0f, green * factor));
-    blue = std::round(std::min(255.0f, blue * factor));
+    red = static_cast<int>(std::round(std::min(255.0f, red * factor)));
+    green = static_cast<int>(std::round(std::min(255.0f, green * factor)));
+    blue = static_cast<int>(std::round(std::min(255.0f, blue * factor)));
 
     // Combine adjusted RGB components back into a single uint32_t
     return (red << 16) | (green << 8) | blue;

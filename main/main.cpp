@@ -45,9 +45,9 @@ int main()
 		std::string imagePath = "D:/resources/images/test.jpg";
 
 		// Initialize source
-		//VideoSource videoSource{ videoPath2 };
-		CaptureSource capSource{ 0 };
-		//CaptureSource capSource{ 0, 1280, 720, 30 };
+		VideoSource videoSource{ videoPath2 };
+		//CaptureSource capSource{ 0 };
+		//CaptureSource capSource{ 0, 1280, 720, 60 };
 		//ImageSource imgSource{ imagePath };
 
 
@@ -61,11 +61,11 @@ int main()
 		renderManager.setColorByName(Color::Green);
 
 		/* VIDEO SORUCE */
-		//renderManager.setFrameSource(&videoSource);
-		////renderManager.setResolution(640, 480);
-		////renderManager.setFPS(10);
-		//renderManager.setColorMode(ColorMode::DYNAMIC);
-		//std::cout << renderManager.toString() << std::endl;
+		renderManager.setFrameSource(&videoSource);
+		//renderManager.setResolution(640, 480);
+		//renderManager.setFPS(10);
+		renderManager.setColorMode(ColorMode::DYNAMIC);
+		std::cout << renderManager.toString() << std::endl;
 
 		/* IMAGE SOURCE */
 		/*renderManager.setFrameSource(&imgSource);
@@ -75,10 +75,10 @@ int main()
 		//std::cout << renderManager.toString() << std::endl;
 
 		/* CAPTURE SORUCE */
-		 renderManager.setFrameSource(&capSource);
-		 //renderManager.setFPS(15);
-		 renderManager.setColorMode(ColorMode::DYNAMIC);
-		 std::cout << renderManager.toString() << std::endl;
+		//renderManager.setFrameSource(&capSource);
+		////renderManager.setFPS(15);
+		//renderManager.setColorMode(ColorMode::DYNAMIC);
+		//std::cout << renderManager.toString() << std::endl;
 
 
 		renderManager.render();

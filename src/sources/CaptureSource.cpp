@@ -22,8 +22,13 @@ void CaptureSource::openDevice(int device)
 {
     std::cout << "Opening capture device..." << std::endl;
 
-    /* LINUX cap open */
+    #ifdef __linux__
+    // Use V4L2 API for Linux
     cap.open(device, cv::CAP_V4L2);
+    #else
+    // Use default API for other platforms
+    cap.open(device);
+    #endif
     if (!cap.isOpened()) {
         throw std::runtime_error("Error opening capture card");
     }

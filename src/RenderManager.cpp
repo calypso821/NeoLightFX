@@ -10,6 +10,7 @@ RenderManager::RenderManager(LEDColorController* colorController)
 	: m_running(false),
 	m_pLedColorController(colorController),
 	m_pFrameSource(nullptr),
+	m_pFrameProcessor(nullptr),
 	m_pVisualController(nullptr),
 	m_pSimController(nullptr)
 {
@@ -69,6 +70,7 @@ void RenderManager::checkTargetProperties()
 				      << std::endl;
 		}
 		// Initialize FrameProcessor with width, height
+		//m_pFrameProcessor = new FrameProcessor();
 		m_pLedColorController->initializeFrameProcessor(m_resolution.first, m_resolution.second);
 
 		/* FPS CHECK */
@@ -115,10 +117,12 @@ void RenderManager::setRenderMode(RenderMode renderMode)
 	{
 		m_pVisualController = new SimulationController{ m_pLedColorController };
 	}
+	#ifdef HARDWARE_MODE
 	if (renderMode == RenderMode::HARDWARE)
 	{
 		m_pVisualController = new HardwareController{ m_pLedColorController };
 	}
+	#endif
 
 	m_renderMode = renderMode;
 }

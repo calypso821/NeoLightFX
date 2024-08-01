@@ -70,7 +70,7 @@ void LEDStripControllerRpi3::render() {
 void LEDStripControllerRpi3::ledArraySetColor(uint32_t* colorArray)
 {
     for (int x = 0; x < m_ledCount; x++) {
-        m_ledArray.channel[0].leds[x] = applyBrightnessCorrection(colorArray[x], 40);
+        m_ledArray.channel[0].leds[x] = applyBrightnessCorrection(colorArray[x], 100);
         //m_ledArray.channel[0].leds[x] = colorArray[x];
     }
 }
