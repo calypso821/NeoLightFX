@@ -1,0 +1,130 @@
+import RPi.GPIO as GPIO
+from time import time
+import subprocess
+import os
+import signal
+
+# Create a dictionary to map shifted and masked IR codes to their meanings
+ir_code_map = {
+    (0xF700FF >> 4) & 0xFFF: "IR_BPLUS",
+    (0xF7807F >> 4) & 0xFFF: "IR_BMINUS",
+    (0xF740BF >> 4) & 0xFFF: "IR_OFF",
+    (0xF7C03F >> 4) & 0xFFF: "IR_ON",
+    (0xF720DF >> 4) & 0xFFF: "IR_R",
+    (0xF7A05F >> 4) & 0xFFF: "IR_G",
+    (0xF7609F >> 4) & 0xFFF: "IR_B",
+    (0xF7E01F >> 4) & 0xFFF: "IR_W",
+    (0xF710EF >> 4) & 0xFFF: "IR_R1",
+    (0xF7906F >> 4) & 0xFFF: "IR_G1",
+    (0xF750AF >> 4) & 0xFFF: "IR_B1",
+    (0xF7D02F >> 4) & 0xFFF: "IR_FLASH",
+    (0xF730CF >> 4) & 0xFFF: "IR_R2",
+    (0xF7B04F >> 4) & 0xFFF: "IR_G2",
+    (0xF7708F >> 4) & 0xFFF: "IR_B2",
+    (0xF7F00F >> 4) & 0xFFF: "IR_STROBE",
+    (0xF708F7 >> 4) & 0xFFF: "IR_R3",
+    (0xF78877 >> 4) & 0xFFF: "IR_G3",
+    (0xF748B7 >> 4) & 0xFFF: "IR_B3",
+    (0xF7C837 >> 4) & 0xFFF: "IR_FADE",
+    (0xF728D7 >> 4) & 0xFFF: "IR_R4",
+    (0xF7A857 >> 4) & 0xFFF: "IR_G4",
+    (0xF76897 >> 4) & 0xFFF: "IR_B4",
+    (0xF7E817 >> 4) & 0xFFF: "IR_SMOOTH"
+}
+
+
+
+executable_file = "/home/pi/NeoPixel/build/my_led_control"
+ir_pin=32
+def setup():
+    GPIO.setmode(GPIO.BOARD)  # Numbers GPIOs by physical location
+    GPIO.setup(ir_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
+
+def binary_aquire(pin, duration):
+    # aquires data as quickly as possible
+    t0 = time()
+    results = []
+    while (time() - t0) < duration:
+        results.append(GPIO.input(pin))
+    return results
+
+
+def on_ir_receive(pinNo, bouncetime=150):
+    # when edge detect is called (which requires less CPU than constant
+    # data acquisition), we acquire data as quickly as possible
+    data = binary_aquire(pinNo, bouncetime/1000.0)
+    oldval=1
+    lastindex=0
+    index=0
+
+    #print('len data, data: ', len(data), data)
+    #print('len gaps,gaps',len(gaps),gaps)
+    if len(data) < bouncetime:
+        return
+    rate = len(data) / (bouncetime / 1000.0)
+    pulses = []
+    i_break = 0
+    # detect run lengths using the acquisition rate to turn the times in to microseconds
+    for i in range(1, len(data)):
+        if (data[i] != data[i-1]) or (i == len(data)-1):
+            pulses.append((data[i-1], int((i-i_break)/rate*1e6)))
+            i_break = i
+
+    outbin = ""
+    for val, us in pulses:
+        if val != 1:
+            continue
+        if outbin and us > 2000:
+            break
+        elif us < 1000:
+            outbin += "0"
+        elif 1000 < us < 2000:
+            outbin += "1"
+    try:
+        return int(outbin, 2)
+    except ValueError:
+        # probably an empty code
+        return None
+
+
+def destroy():
+    GPIO.cleanup()
+
+
+if __name__ == "__main__":
+    setup()
+    try:
+        print("Starting IR Listener")
+        process = None
+        while True:
+            # print("Waiting for signal")
+            GPIO.wait_for_edge(ir_pin, GPIO.FALLING)
+            code = on_ir_receive(ir_pin)
+            if code:
+                trimmed_code = (code >> 4) & 0xFFF
+                # print(hex(trimmed_code))
+                if trimmed_code in ir_code_map:
+                    button = ir_code_map[trimmed_code]
+                    print(button)
+                    if button == "IR_ON" and not process:
+                        # Run the executable in the background
+                        process = subprocess.Popen([executable_file])
+                        pid = process.pid
+                        print(pid)
+                
+     
+                    
+                    
+                #print(str(bin(code)))
+                #print("Invalid code")
+    except KeyboardInterrupt:
+        # User pressed CTRL-C
+        # Reset GPIO settings
+        print("Ctrl-C pressed!")
+    except RuntimeError:
+        # this gets thrown when control C gets pressed
+        # because wait_for_edge doesn't properly pass this on
+        pass
+    print("Quitting")
+    destroy()
