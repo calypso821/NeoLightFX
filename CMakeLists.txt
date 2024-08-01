@@ -45,6 +45,7 @@ set(SOURCES
     ${PROJECT_SOURCE_DIR}/src/utils/mode_utils.cpp
     ${PROJECT_SOURCE_DIR}/src/utils/timer_utils.cpp
     ${PROJECT_SOURCE_DIR}/src/utils/color_processing_utils.cpp
+
 )
 
 # Define a macro for conditional compilation

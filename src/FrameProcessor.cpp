@@ -8,10 +8,8 @@ const float FrameProcessor::WIDTH_PATCH_RATIO = 0.2f;  // 30% of width
 const float FrameProcessor::BLACK_BAR_RATIO = 0.125f;   // 10% of height
 const bool FrameProcessor::DETECT_BLACK_BARS = true;   // automatically deteck black bars
 
-FrameProcessor::FrameProcessor(int ledNum_width, int ledNum_height, bool botttom, int width, int height)
-    : m_ledNum_width(ledNum_width),
-    m_ledNum_height(ledNum_height),
-    m_bottom(botttom)
+FrameProcessor::FrameProcessor(const LEDStripConfig& stripConfig, int width, int height)
+    : m_stripConfig(stripConfig)
 {
     // Default init
     initialize(width, height);
@@ -24,10 +22,10 @@ void FrameProcessor::initialize(int width, int height)
 
     // On Left, Right
     m_verticalPatch_width = static_cast<int>(width * WIDTH_PATCH_RATIO);
-    m_verticalPatch_height = static_cast<int>(height / m_ledNum_height);
+    m_verticalPatch_height = static_cast<int>(height / m_stripConfig.ledNumHeight);
 
     // On Top, Bottom
-    m_horizontalPatch_width = static_cast<int>(width / m_ledNum_width);
+    m_horizontalPatch_width = static_cast<int>(width / m_stripConfig.ledNumWidth);
     m_horizontalPatch_height = static_cast<int>(height * HEIGHT_PATCH_RATIO);
 
     m_blackBar_height = static_cast<int>(height * BLACK_BAR_RATIO);
@@ -35,14 +33,15 @@ void FrameProcessor::initialize(int width, int height)
     m_transitionSpeed = 100;
 }
 
-void FrameProcessor::processFrame(uint32_t* colorArray, cv::Mat frame)
+void FrameProcessor::processFrame(uint32_t* colorArray, cv::Mat frame, double dt)
 {
+    std::cout << "Seconds elapsed: " << dt << std::endl;
     if (DETECT_BLACK_BARS) {
         processBlackBars(frame);
     }
 
-    processHorizontal(colorArray, frame);
-    processVertical(colorArray, frame);
+    processHorizontal(colorArray, frame, dt);
+    processVertical(colorArray, frame, dt);
 }
 
 void FrameProcessor::setTransitionSpeed(int value)
@@ -114,13 +113,21 @@ void FrameProcessor::processBlackBars(cv::Mat frame) {
 //    }
 //    return (red_n << 16) + (green_n << 8) + blue_n;
 //}
-void FrameProcessor::setNewColor(uint32_t* colorArray, int index, uint32_t newColor)
+void FrameProcessor::setNewColor(uint32_t* colorArray, int index, uint32_t newColor, double dt)
 {
+    // Factor = 7.5
+    // 60 FPS -> 0.016667 * 7.5 * 40 = 5 (transition speed)
+    // 30 FPS -> 0.333333 * 7.5 * 40 = 10 (transition speed) 
+    // TODO: 100 --> 100 (transition speed)
+    // 7.5f = constant factor 
+    // 40 = 40% of transition speed (set to m_transitionSpeed)
+    float tSpeed = dt * 7.5f * 40;
+    //float tSpeed = 5;
     // 1. Greyscale correction
     newColor = applyGreyscaleCorrection(newColor);
     //std::cout << "Grayscale: " << uint32ToString(newColor) << std::endl;
     // 2. Apply tranistion correction
-    newColor = applyTransitionCorrection(colorArray[index], newColor, 5);
+    newColor = applyTransitionCorrection(colorArray[index], newColor, tSpeed);
     //std::cout << "Transition: " << uint32ToString(newColor) << std::endl;
     colorArray[index] = newColor;
 }
@@ -135,12 +142,12 @@ uint32_t FrameProcessor::toUint32Color(cv::Scalar color)
     return (red << 16) | (green << 8) | blue;
 }
 
-void FrameProcessor::processHorizontal(uint32_t* array, cv::Mat frame)
+void FrameProcessor::processHorizontal(uint32_t* array, cv::Mat frame, double dt)
 {
     int patch_width = m_horizontalPatch_width;
     int patch_height = m_horizontalPatch_height;
 
-    for (int i = 0; i < m_ledNum_width; i++)
+    for (int i = 0; i < m_stripConfig.ledNumWidth; i++)
     {
         // Top side (Left -> Right)
         cv::Mat patch_top = frame(cv::Rect(
@@ -150,13 +157,13 @@ void FrameProcessor::processHorizontal(uint32_t* array, cv::Mat frame)
             patch_height
         ));
         cv::Scalar meanColor_top = cv::mean(patch_top);
-        int pos_t = i + m_ledNum_height;
-        setNewColor(array, pos_t, toUint32Color(meanColor_top));
+        int pos_t = i + m_stripConfig.ledNumHeight;
+        setNewColor(array, pos_t, toUint32Color(meanColor_top), dt);
 
-        if (m_bottom)
+        if (m_stripConfig.showBottom)
         {
             // Bottom side (Left <- Right)
-            int i_inverse = m_ledNum_width - 1 - i;
+            int i_inverse = m_stripConfig.ledNumWidth - 1 - i;
             cv::Mat patch_bot = frame(cv::Rect(
                 i_inverse * patch_width,
                 m_height - patch_height - m_blackBarOffset,
@@ -164,21 +171,21 @@ void FrameProcessor::processHorizontal(uint32_t* array, cv::Mat frame)
                 patch_height
             ));
             cv::Scalar meanColor_bot = cv::mean(patch_bot);
-            int pos_b = i + m_ledNum_height * 2 + m_ledNum_width;
-            setNewColor(array, pos_b, toUint32Color(meanColor_bot));
+            int pos_b = i + m_stripConfig.ledNumHeight * 2 + m_stripConfig.ledNumWidth;
+            setNewColor(array, pos_b, toUint32Color(meanColor_bot), dt);
         }
     }
 }
 
-void FrameProcessor::processVertical(uint32_t* array, cv::Mat frame)
+void FrameProcessor::processVertical(uint32_t* array, cv::Mat frame, double dt)
 {
     int patch_width = m_verticalPatch_width;
     int patch_height = m_verticalPatch_height;
 
-    for (int i = 0; i < m_ledNum_height; i++)
+    for (int i = 0; i < m_stripConfig.ledNumHeight; i++)
     {
         // Left side (Bottom -> Top)
-        int i_inverse = m_ledNum_height - 1 - i;
+        int i_inverse = m_stripConfig.ledNumHeight - 1 - i;
         cv::Mat patch_left = frame(cv::Rect(
             0,
             i_inverse * patch_height,
@@ -187,7 +194,7 @@ void FrameProcessor::processVertical(uint32_t* array, cv::Mat frame)
         ));
         cv::Scalar meanColor_left = cv::mean(patch_left);
         int pos_l = i;
-        setNewColor(array, pos_l, toUint32Color(meanColor_left));
+        setNewColor(array, pos_l, toUint32Color(meanColor_left), dt);
 
 
         // Right side (Top -> Bottom)
@@ -198,7 +205,7 @@ void FrameProcessor::processVertical(uint32_t* array, cv::Mat frame)
             patch_height
         ));
         cv::Scalar meanColor_right = cv::mean(patch_right);
-        int pos_r = i + m_ledNum_height + m_ledNum_width;
-        setNewColor(array, pos_r, toUint32Color(meanColor_right));
+        int pos_r = i + m_stripConfig.ledNumHeight + m_stripConfig.ledNumWidth;
+        setNewColor(array, pos_r, toUint32Color(meanColor_right), dt);
     }
 }

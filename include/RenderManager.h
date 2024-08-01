@@ -12,6 +12,7 @@
 #include "controllers/VisualController.h"
 #include "controllers/LEDColorController.h"
 #include "controllers/SimulationController.h"
+#include "hardware/LEDStripConfig.h"
 
 #ifdef HARDWARE_MODE
 #include "controllers/HardwareController.h"
@@ -42,7 +43,7 @@ enum class Color {
 class RenderManager
 {
 public:
-	RenderManager(LEDColorController* colorController);
+	RenderManager(const LEDStripConfig& stripConfig);
 
 	void setFPS(float fps);
 	void setResolution(int width, int height);
@@ -70,6 +71,7 @@ private:
 	float m_fps;
 	std::chrono::duration<float, std::milli> m_frameDuration;
 
+	const LEDStripConfig& m_stripConfig;
 	LEDColorController* m_pLedColorController;
 	VisualController* m_pVisualController;
 	SimulationController* m_pSimController;

@@ -6,9 +6,10 @@
 #include "utils/mode_utils.h"
 #include "utils/timer_utils.h"
 
-RenderManager::RenderManager(LEDColorController* colorController)
+RenderManager::RenderManager(const LEDStripConfig& stripConfig)
 	: m_running(false),
-	m_pLedColorController(colorController),
+	m_stripConfig(stripConfig),
+	m_pLedColorController(new LEDColorController(stripConfig)),
 	m_pFrameSource(nullptr),
 	m_pFrameProcessor(nullptr),
 	m_pVisualController(nullptr),
@@ -71,7 +72,10 @@ void RenderManager::checkTargetProperties()
 		}
 		// Initialize FrameProcessor with width, height
 		//m_pFrameProcessor = new FrameProcessor();
-		m_pLedColorController->initializeFrameProcessor(m_resolution.first, m_resolution.second);
+		// TODO: Mybe add this to Dynamic mode? 
+		// And release at STATIC MODDE? 
+		m_pFrameProcessor = new FrameProcessor(m_stripConfig, m_resolution.first, m_resolution.second);
+		//m_pLedColorController->initializeFrameProcessor(m_resolution.first, m_resolution.second);
 
 		/* FPS CHECK */
 		float max_fps = m_pFrameSource->getFPS();
@@ -256,7 +260,8 @@ void RenderManager::render()
 				if (!hasNextFrame) {
 					break;
 				}
-				m_pLedColorController->setColorBySource(m_frame);
+				m_pFrameProcessor->processFrame(pColorArray, m_frame, elapsed.count());
+				//m_pLedColorController->setColorBySource(m_frame);
 			}
 		}
 

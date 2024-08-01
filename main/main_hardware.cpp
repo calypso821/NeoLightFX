@@ -4,6 +4,7 @@
 #include <opencv2/opencv.hpp>
 
 #include "controllers/LEDColorController.h"
+#include "hardware/LEDStripConfig.h"
 #include "sources/VideoSource.h"
 #include "sources/CaptureSource.h"
 #include "sources/ImageSource.h"
@@ -32,12 +33,7 @@ int main()
 		// Set OpenCV logging level to show only errors
 		//cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_ERROR);
 
-		int numLedWidth = 34;
-		int numLedHeight = 20;
-		bool showBottom = false;
-
-		// Initialize Color controller
-		LEDColorController ledColorController{ numLedWidth, numLedHeight, showBottom };
+		LEDStripConfig stripConfig{ 34, 20, true };
 
 		// File paths
 		std::string videoPath = "D:/resources/videos/Ambilight.mp4";
@@ -53,7 +49,7 @@ int main()
 		//ImageSource imgSource{ imagePath };
 
 
-		RenderManager renderManager{ &ledColorController };
+		RenderManager renderManager{ stripConfig };
 		// Assign address of renderManager object to global pointer
 		g_pRenderManager = &renderManager;
 

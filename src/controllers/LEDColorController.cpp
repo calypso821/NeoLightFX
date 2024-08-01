@@ -3,11 +3,8 @@
 #include "controllers/LEDColorController.h"
 
 
-LEDColorController::LEDColorController(int ledNum_width, int ledNum_height, bool showBottom)
-    : m_frameProcessor(nullptr),
-    m_ledNum_width(ledNum_width),
-    m_ledNum_height(ledNum_height),
-    m_showBottom(showBottom),
+LEDColorController::LEDColorController(const LEDStripConfig& stripConfig)
+    : m_stripConfig(stripConfig),
     m_brightness(100)
 {
     // Init color array (allocate memory)
@@ -22,18 +19,12 @@ LEDColorController::~LEDColorController()
     delete[] m_pColorArray;
 }
 
-void LEDColorController::initializeFrameProcessor(int width, int height)
-{
-    // INIT ImageProcessor
-    m_frameProcessor = new FrameProcessor(m_ledNum_width, m_ledNum_height, m_showBottom, width, height);
-}
-
 void LEDColorController::initColorArray()
 {
-    int size = 2 * m_ledNum_height + m_ledNum_width;
-    if (m_showBottom)
+    int size = 2 * m_stripConfig.ledNumHeight + m_stripConfig.ledNumWidth;
+    if (m_stripConfig.showBottom)
     {
-        size += m_ledNum_width;
+        size += m_stripConfig.ledNumWidth;
     }
 
     // Allocate color array memory
@@ -63,11 +54,11 @@ int LEDColorController::getLedCount()
 }
 bool LEDColorController::getBottomStatus()
 {
-    return m_showBottom;
+    return m_stripConfig.showBottom;
 }
 std::pair<int, int> LEDColorController::getLedResolution()
 {
-    return { m_ledNum_width, m_ledNum_height };
+    return { m_stripConfig.ledNumWidth, m_stripConfig.ledNumHeight };
 }
 
 void LEDColorController::setStaticColor(uint32_t color)
@@ -76,11 +67,6 @@ void LEDColorController::setStaticColor(uint32_t color)
     {
         m_pColorArray[i] = color;
     }
-}
-
-void LEDColorController::setColorBySource(cv::Mat frame)
-{
-    m_frameProcessor->processFrame(m_pColorArray, frame);
 }
 
 void LEDColorController::setBrightness(int value)

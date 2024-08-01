@@ -22,9 +22,9 @@ uint8_t lerp(uint8_t a, uint8_t b, float t)
 	return static_cast<uint8_t>(std::floor((b - a) * t + a));
 }
 
-uint32_t applyTransitionCorrection(uint32_t oldColor, uint32_t newColor, int transitionSpeed)
+uint32_t applyTransitionCorrection(uint32_t oldColor, uint32_t newColor, float tSpeed)
 {
-    float alpha = transitionSpeed / 100.0f;
+    float alpha = tSpeed / 100.0f;
     // TODO: Add dt (delta time)
 
     uint8_t oldRed = (oldColor >> 16) & 0xFF;
