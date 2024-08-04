@@ -31,7 +31,6 @@ private:
 
     int m_brightness;
 
-    int m_colorArraySize;
     uint32_t* m_pColorArray;
 
     void initColorArray();

@@ -21,22 +21,13 @@ LEDColorController::~LEDColorController()
 
 void LEDColorController::initColorArray()
 {
-    int size = 2 * m_stripConfig.ledNumHeight + m_stripConfig.ledNumWidth;
-    if (m_stripConfig.showBottom)
-    {
-        size += m_stripConfig.ledNumWidth;
-    }
-
     // Allocate color array memory
-    m_pColorArray = new uint32_t[size];
-
-    // Set array size
-    m_colorArraySize = size;
+    m_pColorArray = new uint32_t[m_stripConfig.count];
 }
     
 void LEDColorController::clearColorArray()
 {
-    memset(m_pColorArray, 0, sizeof(uint32_t) * m_colorArraySize);
+    memset(m_pColorArray, 0, sizeof(uint32_t) * m_stripConfig.count);
 }
 
 uint32_t* LEDColorController::getColorArray()
@@ -46,7 +37,7 @@ uint32_t* LEDColorController::getColorArray()
 
 int LEDColorController::getColorArraySize()
 {
-    return m_colorArraySize;
+    return m_stripConfig.count;
 }
 int LEDColorController::getLedCount()
 {
@@ -54,16 +45,16 @@ int LEDColorController::getLedCount()
 }
 bool LEDColorController::getBottomStatus()
 {
-    return m_stripConfig.showBottom;
+    return m_stripConfig.bottom;
 }
 std::pair<int, int> LEDColorController::getLedResolution()
 {
-    return { m_stripConfig.ledNumWidth, m_stripConfig.ledNumHeight };
+    return { m_stripConfig.width, m_stripConfig.height };
 }
 
 void LEDColorController::setStaticColor(uint32_t color)
 {
-    for (int i = 0; i < m_colorArraySize; ++i)
+    for (int i = 0; i < m_stripConfig.count; ++i)
     {
         m_pColorArray[i] = color;
     }
