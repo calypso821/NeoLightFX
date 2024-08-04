@@ -33,7 +33,14 @@ int main()
 		// Set OpenCV logging level to show only errors
 		cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_ERROR);
 
-		LEDStripConfig stripConfig{ 34, 20, true };
+		LEDStripConfig stripConfig;
+		if (mode == "pattern") {
+			stripConfig = LEDStripConfig{ 10 };
+		}
+		else {
+			stripConfig = LEDStripConfig{ 34, 20, true };
+		}
+		
 		
 		// File paths
 		std::string videoPath = "D:/resources/videos/Ambilight.mp4";
@@ -51,7 +58,12 @@ int main()
 			renderManager.setColorMode(ColorMode::STATIC);
 			renderManager.setColorByName(Color::Green);
 		} 
-		else if(mode == "video")
+		else if (mode == "pattern")
+		{
+			/* PATTERN */
+			renderManager.setColorMode(ColorMode::PATTERN);
+		}
+		else if (mode == "video")
 		{
 			/* VIDEO SORUCE */
 			VideoSource videoSource{ videoPath2 };

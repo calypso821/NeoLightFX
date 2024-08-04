@@ -28,7 +28,7 @@ enum class ColorMode
 {
 	STATIC,
 	DYNAMIC,
-	//PATTERN,
+	PATTERN,
 	//SOUND
 };
 

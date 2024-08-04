@@ -35,21 +35,9 @@ uint32_t* LEDColorController::getColorArray()
     return m_pColorArray;
 }
 
-int LEDColorController::getColorArraySize()
+const LEDStripConfig& LEDColorController::getStripConfig()
 {
-    return m_stripConfig.count;
-}
-int LEDColorController::getLedCount()
-{
-    return getColorArraySize();
-}
-bool LEDColorController::getBottomStatus()
-{
-    return m_stripConfig.bottom;
-}
-std::pair<int, int> LEDColorController::getLedResolution()
-{
-    return { m_stripConfig.width, m_stripConfig.height };
+    return m_stripConfig;
 }
 
 void LEDColorController::setStaticColor(uint32_t color)

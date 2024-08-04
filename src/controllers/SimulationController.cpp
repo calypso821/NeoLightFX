@@ -10,39 +10,80 @@ void SimulationController::shutdown()
     cv::destroyAllWindows();
 }
 
-void SimulationController::renderFrame()
+void SimulationController::render()
 {
     // Show the canvas with LEDs
     cv::imshow("LED Simulation", m_canvas);
     cv::waitKey(1); // Wait for a short period to update the display
 }
-void SimulationController::clearFrame()
+void SimulationController::clear()
 {
     // Clear m_canvas by setting all its pixels to black
     m_canvas.setTo(cv::Scalar(0, 0, 0));
 }
 
-void SimulationController::simulate(const cv::Mat& frame) {
+void SimulationController::simulateStrip()
+{
+    // To fit 75% of screen? 
+    // Start filling next line??
+    int ledSize = 30;
+    m_canvas = cv::Mat(ledSize, ledSize * m_stripConfig.count, CV_8UC3, cv::Scalar(0, 0, 0));
+
+    int borderThickness = 2; // Thickness of the border
+
+    for (int i = 0; i < m_stripConfig.count; ++i) {
+        // Top side
+        cv::rectangle(
+            m_canvas,
+            // Area
+            cv::Rect(
+                i * ledSize, // + borderThickness,
+                0,
+                ledSize,
+                ledSize
+            ),
+            // Color
+            cv::Scalar(
+                m_pColorArray[i] & 0xFF,
+                (m_pColorArray[i] >> 8) & 0xFF,
+                (m_pColorArray[i] >> 16) & 0xFF
+            ),
+            cv::FILLED
+        );
+
+        // Border
+        cv::line(
+            m_canvas,
+            cv::Point(
+                i * ledSize - borderThickness,
+                0
+            ),
+            cv::Point(
+                i * ledSize - borderThickness,
+                ledSize
+            ),
+            cv::Scalar(0, 0, 0),
+            borderThickness
+        );
+    }
+
+}
+
+void SimulationController::simulateFrame(const cv::Mat& frame) {
     assert(!frame.empty() && "Frame is empty");
     try {
         if (frame.empty()) {
             throw std::runtime_error("Input frame is empty");
         }
 
-        std::pair<int, int> ledRes = m_pLedColorController->getLedResolution();
-        int ledNum_width = ledRes.first;
-        int ledNum_height = ledRes.second;
-        int showBottom = m_pLedColorController->getBottomStatus();
-        //uint32_t* colorArray = m_pColorArray;
-
         int width = frame.cols;
         int height = frame.rows;
 
-        int verticalLedSize = height / ledNum_height;
-        int horizontalLedSize = width / ledNum_width;
+        int verticalLedSize = height / m_stripConfig.height;
+        int horizontalLedSize = width / m_stripConfig.width;
 
         int borderThickness = 2; // Thickness of the border
-        cv::Scalar borderColor = cv::Scalar(0, 0, 0); // White border
+        cv::Scalar borderColor = cv::Scalar(0, 0, 0); // Black border
 
         // Add border to the frame
         cv::Mat frameWithBorder;
@@ -57,16 +98,10 @@ void SimulationController::simulate(const cv::Mat& frame) {
             borderColor
         );
 
-        // Check if frameWithBorder is valid
-        if (frameWithBorder.empty()) {
-            throw std::runtime_error("frameWithBorder is empty after adding border");
-        }
-
         // Create a larger canvas
         int canvasWidth = frame.cols + verticalLedSize * 2 + borderThickness * 2;
         int canvasHeight = frame.rows + horizontalLedSize * 2 + borderThickness * 2;
         m_canvas = cv::Mat(canvasHeight, canvasWidth, CV_8UC3, cv::Scalar(0, 0, 0));
-        //cv::Mat canvas(canvasHeight, canvasWidth, CV_8UC3, cv::Scalar(0, 0, 0));
 
         // Check if canvas is valid
         if (m_canvas.empty()) {
@@ -77,9 +112,9 @@ void SimulationController::simulate(const cv::Mat& frame) {
         frameWithBorder.copyTo(m_canvas(cv::Rect(verticalLedSize, horizontalLedSize, frameWithBorder.cols, frameWithBorder.rows)));
 
         // Draw Top, Bottom
-        int offset_t = ledNum_height;
-        int offset_b = ledNum_height * 2 + ledNum_width;
-        for (int i = 0; i < ledNum_width; ++i) {
+        int offset_t = m_stripConfig.height;
+        int offset_b = m_stripConfig.height * 2 + m_stripConfig.width;
+        for (int i = 0; i < m_stripConfig.width; ++i) {
             // Top side
             cv::rectangle(
                 m_canvas,
@@ -115,8 +150,8 @@ void SimulationController::simulate(const cv::Mat& frame) {
             );
 
             // Bottom side
-            if (showBottom) {
-                int i_inverse = ledNum_width - 1 - i;
+            if (m_stripConfig.bottom) {
+                int i_inverse = m_stripConfig.width - 1 - i;
                 cv::rectangle(
                     m_canvas,
                     // Area
@@ -153,10 +188,10 @@ void SimulationController::simulate(const cv::Mat& frame) {
 
         // Draw Left, Right
         int offset_l = 0;
-        int offset_r = ledNum_height + ledNum_width;
-        for (int i = 0; i < ledNum_height; ++i) {
+        int offset_r = m_stripConfig.height + m_stripConfig.width;
+        for (int i = 0; i < m_stripConfig.height; ++i) {
             // Left side
-            int i_inverse = ledNum_height - 1 - i;
+            int i_inverse = m_stripConfig.height - 1 - i;
             cv::rectangle(
                 m_canvas,
                 // Area

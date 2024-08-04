@@ -15,10 +15,7 @@ public:
     ~LEDColorController();
 
     uint32_t* getColorArray();
-    int getColorArraySize();
-    int getLedCount();
-    bool getBottomStatus();
-    std::pair<int, int> getLedResolution();
+    const LEDStripConfig& getStripConfig();
 
     void setStaticColor(uint32_t color);
     void setBrightness(int value);

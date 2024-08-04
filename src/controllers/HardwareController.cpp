@@ -27,13 +27,13 @@ void HardwareController::shutdown()
 	m_pLedStripController->render();
 }
 
-void HardwareController::renderFrame()
+void HardwareController::render()
 {
 	m_pLedStripController->ledArraySetColor(m_pColorArray);
 	m_pLedStripController->render();
 }
 
-void HardwareController::clearFrame()
+void HardwareController::clear()
 {
 	m_pLedStripController->ledArrayClear();
 	m_pLedStripController->render();

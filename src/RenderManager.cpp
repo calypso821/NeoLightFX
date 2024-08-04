@@ -271,11 +271,11 @@ void RenderManager::render()
 			// Resize the frame to target resolution
 			m_pSimController->resizeFrame(m_frame, resizedFrame, targetSize);
 			/* Simulate LED strip */
-			m_pSimController->simulate(resizedFrame);
+			m_pSimController->simulateFrame(resizedFrame);
 		}
 
 		/* RENDER (display/led strip) */
-		m_pVisualController->renderFrame();
+		m_pVisualController->render();
 		
 		/* USER CODE - END */
 

@@ -15,11 +15,11 @@ public:
 
     //void initialize() override;
     void shutdown() override;
-    void renderFrame() override;
-    void clearFrame() override;
+    void render() override;
+    void clear() override;
 
-
-    void simulate(const cv::Mat& frame);
+    void simulateStrip();
+    void simulateFrame(const cv::Mat& frame);
     void resizeFrame(const cv::Mat& frame, cv::Mat& resizedFrame, cv::Size targetSize);
     cv::Mat createSolidColorFrame(int width, int height, uint32_t color);
 

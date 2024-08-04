@@ -9,6 +9,10 @@ struct LEDStripConfig {
     int count;
     bool bottom;
 
+    // Default constructor
+    LEDStripConfig()
+        : width(0), height(0), count(0), bottom(false) {}
+
     // Constructor with width, height, and bottom
     LEDStripConfig(int ledNumWidth, int ledNumHeight, bool showBottom)
         : width(ledNumWidth),

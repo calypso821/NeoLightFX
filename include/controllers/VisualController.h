@@ -2,13 +2,15 @@
 #define VISUALCONTROLLER_H
 
 #include "controllers/LEDColorController.h"
+#include "hardware/LEDStripConfig.h"
 
 class VisualController
 {
 public:
 	VisualController(LEDColorController* colorController)
 		: m_pLedColorController(colorController),
-		m_pColorArray(colorController->getColorArray())
+		m_pColorArray(colorController->getColorArray()),
+		m_stripConfig(colorController->getStripConfig())
 	{};
 	virtual ~VisualController() = default;
 
@@ -17,10 +19,11 @@ public:
 	virtual void shutdown() {};
 
 	// Frame Handling
-	virtual void renderFrame() = 0;
-	virtual void clearFrame() = 0;
+	virtual void render() = 0;
+	virtual void clear() = 0;
 
 protected: 
+	const LEDStripConfig& m_stripConfig;
 	LEDColorController* m_pLedColorController;
 	uint32_t* m_pColorArray;
 };

@@ -17,8 +17,8 @@ public:
 
     void initialize() override;
     void shutdown() override;
-    void renderFrame() override;
-    void clearFrame() override;
+    void render() override;
+    void clear() override;
 
 private:
     LEDStripController* m_pLedStripController;

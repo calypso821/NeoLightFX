@@ -79,11 +79,23 @@ if(SIMULATE)
         ${PROJECT_SOURCE_DIR}/main/main.cpp
         ${SOURCES}
     )
+     add_executable(NeoLightFX_SimPattern
+        ${PROJECT_SOURCE_DIR}/example/pattern.cpp
+        ${SOURCES}
+    )
+
     target_link_libraries(NeoLightFX_Simulator PRIVATE ${OpenCV_LIBS})
-    # Link against winmm.lib
+    target_link_libraries(NeoLightFX_SimPattern PRIVATE ${OpenCV_LIBS})
+
+    # Link against winmm.lib (percision timer)
     if(WIN32)
         target_link_libraries(NeoLightFX_Simulator PRIVATE winmm)
+        target_link_libraries(NeoLightFX_SimPattern PRIVATE winmm)
     endif()
+
+   
+    
+
 endif()
 
 # HARDWARE executable
