@@ -17,6 +17,27 @@ const float FACTOR_R = 1.0f;
 const float FACTOR_G = 1.2f;
 const float FACTOR_B = 0.8f;
 
+// Function to interpolate between two uint32_t colors
+uint32_t lerpColor(uint32_t color1, uint32_t color2, float t) {
+    // Extract the individual color channels
+    uint8_t r1 = (color1 >> 16) & 0xFF;
+    uint8_t g1 = (color1 >> 8) & 0xFF;
+    uint8_t b1 = color1 & 0xFF;
+
+    uint8_t r2 = (color2 >> 16) & 0xFF;
+    uint8_t g2 = (color2 >> 8) & 0xFF;
+    uint8_t b2 = color2 & 0xFF;
+
+    // Interpolate each channel separately
+    uint8_t r = static_cast<uint8_t>(r1 + t * (r2 - r1));
+    uint8_t g = static_cast<uint8_t>(g1 + t * (g2 - g1));
+    uint8_t b = static_cast<uint8_t>(b1 + t * (b2 - b1));
+
+    // Combine the interpolated channels back into a uint32_t value
+    uint32_t result = (r << 16) | (g << 8) | b;
+    return result;
+}
+
 uint8_t lerp(uint8_t a, uint8_t b, float t)
 {
 	return static_cast<uint8_t>(std::floor((b - a) * t + a));
