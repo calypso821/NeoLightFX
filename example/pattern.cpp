@@ -4,24 +4,11 @@
 #include <opencv2/core/utils/logger.hpp>
 
 #include "controllers/LEDColorController.h"
-#include "hardware/LEDStripConfig.h"
 #include "controllers/SimulationController.h"
+#include "controllers/EffectController.h"
+#include "hardware/LEDStripConfig.h"
 #include "RenderManager.h"
 #include "utils/Debug.h"
-#include "utils/color_processing_utils.h"
-
-uint32_t rainbowColors[] = {
-	0xFFA500, // Orange
-	0xFFFF00, // Yellow
-	0x00FF00, // Green
-	0x0000FF, // Blue
-	0x4B0082, // Indigo
-	0xEE82EE,  // Violet
-	0xFF0000, // Red
-};
-
-// Optionally, you can define the size of the array
-constexpr size_t rainbowColorsSize = sizeof(rainbowColors) / sizeof(rainbowColors[0]);
 
 // Global pointer to RenderManager
 RenderManager* g_pRenderManager = nullptr;
@@ -39,22 +26,20 @@ static void signalHandler(int signal)
 	}
 }
 
-
-
-void rainbowEffect(uint32_t* p_colorArray, float progress)
-{
-	for (size_t i = 0; i < stripConfig.count; ++i) {
-		float ledPosition = static_cast<float>(i) / stripConfig.count;
-		float colorPosition = fmod(progress + ledPosition, 1.0f) * rainbowColorsSize;
-
-		size_t colorIndex1 = static_cast<size_t>(colorPosition);
-		size_t colorIndex2 = (colorIndex1 + 1) % rainbowColorsSize;
-
-		float t = colorPosition - colorIndex1;
-
-		p_colorArray[i] = lerpColor(rainbowColors[colorIndex1], rainbowColors[colorIndex2], t);
-	}
-}
+//void rainbowEffect(uint32_t* p_colorArray, float progress)
+//{
+//	for (size_t i = 0; i < stripConfig.count; ++i) {
+//		float ledPosition = static_cast<float>(i) / stripConfig.count;
+//		float colorPosition = fmod(progress + ledPosition, 1.0f) * rainbowColorsSize;
+//
+//		size_t colorIndex1 = static_cast<size_t>(colorPosition);
+//		size_t colorIndex2 = (colorIndex1 + 1) % rainbowColorsSize;
+//
+//		float t = colorPosition - colorIndex1;
+//
+//		p_colorArray[i] = lerpColor(rainbowColors[colorIndex1], rainbowColors[colorIndex2], t);
+//	}
+//}
 
 int main()
 {
@@ -71,48 +56,56 @@ int main()
 	uint32_t* p_colorArray = colorController.getColorArray();
 	SimulationController simController{ &colorController };
 
-
 	static float progress = 0;
-	static int prog = 0;
-	static int lengthProg = stripConfig.count / 2;
+
+	EffectController effectController{ stripConfig };
+	//effectController.addEffect("rainbow", std::make_shared<RainbowEffect>());
+	//effectController.addEffect("progress", std::make_shared<ProgressEffect>());
+
+	effectController.setEffect(EffectType::RAINBOW); // Set initial effect
 
 	while (isRunning.load())
 	{
+		//if (progress > 1.0f)
+		//{
+		//	// Reset progress (start again)
+		//	progress = 0;
+		//}
+
+		////rainbowEffect(p_colorArray, progress);
+
+		//if (prog <= lengthProg)
+		//{
+		//	for (size_t i = 0; i <= lengthProg; i++)
+		//	{
+		//		p_colorArray[i] = 0;
+		//		p_colorArray[stripConfig.count - 1 - i] = 0;
+
+		//		p_colorArray[prog] = 0xFFFFFF;
+		//		p_colorArray[stripConfig.count - 1 - prog] = 0xFFFFFF;
+		//	}
+		//	prog++;
+		//}
+		//else
+		//{
+		//	lengthProg--;
+		//	prog = 0;
+		//}
+
 		if (progress > 1.0f)
 		{
-			// Reset progress (start again)
 			progress = 0;
 		}
 
-		//rainbowEffect(p_colorArray, progress);
-
-		if (prog <= lengthProg)
-		{
-			for (size_t i = 0; i <= lengthProg; i++)
-			{
-				p_colorArray[i] = 0;
-				p_colorArray[stripConfig.count - 1 - i] = 0;
-
-				p_colorArray[prog] = 0xFFFFFF;
-				p_colorArray[stripConfig.count - 1 - prog] = 0xFFFFFF;
-			}
-			prog++;
-		}
-		else
-		{
-			lengthProg--;
-			prog = 0;
-		}
-
-		
+		effectController.applyEffect(p_colorArray, progress);
 
 		simController.simulateStrip();
 		simController.render();
 
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
 		progress += 0.1f;
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(50));
+		
 	}
 
 

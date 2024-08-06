@@ -36,10 +36,12 @@ file(GLOB_RECURSE SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
 set(SOURCES 
     ${PROJECT_SOURCE_DIR}/src/controllers/LEDColorController.cpp
     ${PROJECT_SOURCE_DIR}/src/controllers/SimulationController.cpp
+    ${PROJECT_SOURCE_DIR}/src/controllers/EffectController.cpp
     ${PROJECT_SOURCE_DIR}/src/sources/VideoSource.cpp
     ${PROJECT_SOURCE_DIR}/src/sources/CaptureSource.cpp
     ${PROJECT_SOURCE_DIR}/src/sources/ImageSource.cpp
     ${PROJECT_SOURCE_DIR}/src/FrameProcessor.cpp
+    ${PROJECT_SOURCE_DIR}/src/Effects.cpp
     ${PROJECT_SOURCE_DIR}/src/RenderManager.cpp
     ${PROJECT_SOURCE_DIR}/src/utils/Debug.cpp
     ${PROJECT_SOURCE_DIR}/src/utils/mode_utils.cpp
@@ -92,10 +94,6 @@ if(SIMULATE)
         target_link_libraries(NeoLightFX_Simulator PRIVATE winmm)
         target_link_libraries(NeoLightFX_SimPattern PRIVATE winmm)
     endif()
-
-   
-    
-
 endif()
 
 # HARDWARE executable
